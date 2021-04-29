@@ -1,0 +1,15 @@
+D:\OSSA_new\ossaTool\bin\Debug\netcoreapp3.1\ossaTool.exe
+D:\OSSA_new\ossaTool\bin\Debug\netcoreapp3.1\ossaTool.deps.json
+D:\OSSA_new\ossaTool\bin\Debug\netcoreapp3.1\ossaTool.runtimeconfig.json
+D:\OSSA_new\ossaTool\bin\Debug\netcoreapp3.1\ossaTool.runtimeconfig.dev.json
+D:\OSSA_new\ossaTool\bin\Debug\netcoreapp3.1\ossaTool.dll
+D:\OSSA_new\ossaTool\bin\Debug\netcoreapp3.1\ossaTool.pdb
+D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.Form1.resources
+D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.csproj.GenerateResource.cache
+D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.AssemblyInfoInputs.cache
+D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.AssemblyInfo.cs
+D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.csproj.CoreCompileInputs.cache
+D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.dll
+D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.pdb
+D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.genruntimeconfig.cache
+D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.csprojAssemblyReference.cache
