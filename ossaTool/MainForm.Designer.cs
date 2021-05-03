@@ -31,6 +31,7 @@ namespace ossaTool
         {
             this.tabControlMenu = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.txtLog = new System.Windows.Forms.TextBox();
             this.pgBarQFIL = new System.Windows.Forms.ProgressBar();
             this.pgBarConnection = new System.Windows.Forms.ProgressBar();
             this.txt1QFILStatus = new System.Windows.Forms.TextBox();
@@ -40,7 +41,6 @@ namespace ossaTool
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.bgWorkerConnection = new System.ComponentModel.BackgroundWorker();
             this.bgWorkerQFIL = new System.ComponentModel.BackgroundWorker();
-            this.txtLog = new System.Windows.Forms.TextBox();
             this.tabControlMenu.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -55,7 +55,6 @@ namespace ossaTool
             this.tabControlMenu.SelectedIndex = 0;
             this.tabControlMenu.Size = new System.Drawing.Size(800, 450);
             this.tabControlMenu.TabIndex = 0;
-            this.tabControlMenu.SelectedIndexChanged += new System.EventHandler(this.tabControlMenu_SelectedIndexChanged);
             // 
             // tabPage1
             // 
@@ -73,7 +72,16 @@ namespace ossaTool
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Step 1: 環境建立";
             this.tabPage1.UseVisualStyleBackColor = true;
-            this.tabPage1.Click += new System.EventHandler(this.tabPage1_Click);
+            // 
+            // txtLog
+            // 
+            this.txtLog.Location = new System.Drawing.Point(206, 140);
+            this.txtLog.Multiline = true;
+            this.txtLog.Name = "txtLog";
+            this.txtLog.ReadOnly = true;
+            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtLog.Size = new System.Drawing.Size(398, 130);
+            this.txtLog.TabIndex = 7;
             // 
             // pgBarQFIL
             // 
@@ -158,15 +166,6 @@ namespace ossaTool
             this.bgWorkerQFIL.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgWorkerQFIL_DoWork);
             this.bgWorkerQFIL.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgWorkerQFIL_ProgressChanged);
             this.bgWorkerQFIL.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgWorkerQFIL_RunWorkerCompleted);
-            // 
-            // txtLog
-            // 
-            this.txtLog.Location = new System.Drawing.Point(206, 140);
-            this.txtLog.Multiline = true;
-            this.txtLog.Name = "txtLog";
-            this.txtLog.ReadOnly = true;
-            this.txtLog.Size = new System.Drawing.Size(398, 189);
-            this.txtLog.TabIndex = 7;
             // 
             // MainForm
             // 
