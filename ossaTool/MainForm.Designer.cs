@@ -31,6 +31,9 @@ namespace ossaTool
         {
             this.tabControlMenu = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.txt1EdlStatus = new System.Windows.Forms.TextBox();
+            this.pgBarEdl = new System.Windows.Forms.ProgressBar();
+            this.btnEdl = new System.Windows.Forms.Button();
             this.txtLog = new System.Windows.Forms.TextBox();
             this.pgBarQFIL = new System.Windows.Forms.ProgressBar();
             this.pgBarConnection = new System.Windows.Forms.ProgressBar();
@@ -41,6 +44,7 @@ namespace ossaTool
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.bgWorkerConnection = new System.ComponentModel.BackgroundWorker();
             this.bgWorkerQFIL = new System.ComponentModel.BackgroundWorker();
+            this.bgWorkerEdl = new System.ComponentModel.BackgroundWorker();
             this.tabControlMenu.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -58,6 +62,10 @@ namespace ossaTool
             // 
             // tabPage1
             // 
+            this.tabPage1.BackColor = System.Drawing.Color.DarkSeaGreen;
+            this.tabPage1.Controls.Add(this.txt1EdlStatus);
+            this.tabPage1.Controls.Add(this.pgBarEdl);
+            this.tabPage1.Controls.Add(this.btnEdl);
             this.tabPage1.Controls.Add(this.txtLog);
             this.tabPage1.Controls.Add(this.pgBarQFIL);
             this.tabPage1.Controls.Add(this.pgBarConnection);
@@ -71,11 +79,41 @@ namespace ossaTool
             this.tabPage1.Size = new System.Drawing.Size(792, 422);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Step 1: 環境建立";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // txt1EdlStatus
+            // 
+            this.txt1EdlStatus.Location = new System.Drawing.Point(364, 80);
+            this.txt1EdlStatus.Name = "txt1EdlStatus";
+            this.txt1EdlStatus.ReadOnly = true;
+            this.txt1EdlStatus.Size = new System.Drawing.Size(240, 23);
+            this.txt1EdlStatus.TabIndex = 10;
+            // 
+            // pgBarEdl
+            // 
+            this.pgBarEdl.Location = new System.Drawing.Point(206, 80);
+            this.pgBarEdl.Name = "pgBarEdl";
+            this.pgBarEdl.Size = new System.Drawing.Size(139, 23);
+            this.pgBarEdl.Step = 1;
+            this.pgBarEdl.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.pgBarEdl.TabIndex = 9;
+            // 
+            // btnEdl
+            // 
+            this.btnEdl.BackColor = System.Drawing.Color.MistyRose;
+            this.btnEdl.Enabled = false;
+            this.btnEdl.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnEdl.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btnEdl.Location = new System.Drawing.Point(65, 80);
+            this.btnEdl.Name = "btnEdl";
+            this.btnEdl.Size = new System.Drawing.Size(117, 23);
+            this.btnEdl.TabIndex = 8;
+            this.btnEdl.Text = "切換燒機模式";
+            this.btnEdl.UseVisualStyleBackColor = false;
+            this.btnEdl.Click += new System.EventHandler(this.btnEdl_Click);
             // 
             // txtLog
             // 
-            this.txtLog.Location = new System.Drawing.Point(206, 140);
+            this.txtLog.Location = new System.Drawing.Point(206, 184);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
@@ -85,7 +123,7 @@ namespace ossaTool
             // 
             // pgBarQFIL
             // 
-            this.pgBarQFIL.Location = new System.Drawing.Point(206, 88);
+            this.pgBarQFIL.Location = new System.Drawing.Point(206, 122);
             this.pgBarQFIL.Name = "pgBarQFIL";
             this.pgBarQFIL.Size = new System.Drawing.Size(139, 23);
             this.pgBarQFIL.Step = 1;
@@ -103,7 +141,7 @@ namespace ossaTool
             // 
             // txt1QFILStatus
             // 
-            this.txt1QFILStatus.Location = new System.Drawing.Point(364, 89);
+            this.txt1QFILStatus.Location = new System.Drawing.Point(364, 123);
             this.txt1QFILStatus.Name = "txt1QFILStatus";
             this.txt1QFILStatus.ReadOnly = true;
             this.txt1QFILStatus.Size = new System.Drawing.Size(240, 23);
@@ -111,10 +149,10 @@ namespace ossaTool
             // 
             // btnQFIL
             // 
-            this.btnQFIL.BackColor = System.Drawing.Color.DarkSalmon;
+            this.btnQFIL.BackColor = System.Drawing.Color.MistyRose;
             this.btnQFIL.Enabled = false;
             this.btnQFIL.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnQFIL.Location = new System.Drawing.Point(65, 89);
+            this.btnQFIL.Location = new System.Drawing.Point(65, 123);
             this.btnQFIL.Name = "btnQFIL";
             this.btnQFIL.Size = new System.Drawing.Size(117, 23);
             this.btnQFIL.TabIndex = 2;
@@ -125,13 +163,13 @@ namespace ossaTool
             // 
             // btn1ConnectCheck
             // 
-            this.btn1ConnectCheck.BackColor = System.Drawing.Color.Moccasin;
+            this.btn1ConnectCheck.BackColor = System.Drawing.Color.MistyRose;
             this.btn1ConnectCheck.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btn1ConnectCheck.Location = new System.Drawing.Point(65, 41);
             this.btn1ConnectCheck.Name = "btn1ConnectCheck";
             this.btn1ConnectCheck.Size = new System.Drawing.Size(117, 23);
             this.btn1ConnectCheck.TabIndex = 1;
-            this.btn1ConnectCheck.Text = "確認攝影機狀態";
+            this.btn1ConnectCheck.Text = "攝影機連接確認";
             this.btn1ConnectCheck.UseVisualStyleBackColor = false;
             this.btn1ConnectCheck.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -167,6 +205,13 @@ namespace ossaTool
             this.bgWorkerQFIL.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgWorkerQFIL_ProgressChanged);
             this.bgWorkerQFIL.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgWorkerQFIL_RunWorkerCompleted);
             // 
+            // bgWorkerEdl
+            // 
+            this.bgWorkerEdl.WorkerReportsProgress = true;
+            this.bgWorkerEdl.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgWorkerEdl_DoWork);
+            this.bgWorkerEdl.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgWorkerEdl_ProgressChanged);
+            this.bgWorkerEdl.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgWorkerEdl_RunWorkerCompleted);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -196,6 +241,10 @@ namespace ossaTool
         private System.Windows.Forms.ProgressBar pgBarQFIL;
         private System.Windows.Forms.ProgressBar pgBarConnection;
         private System.Windows.Forms.TextBox txtLog;
+        private System.Windows.Forms.TextBox txt1EdlStatus;
+        private System.Windows.Forms.ProgressBar pgBarEdl;
+        private System.Windows.Forms.Button btnEdl;
+        private System.ComponentModel.BackgroundWorker bgWorkerEdl;
     }
 }
 

@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace ossaTool
 {
@@ -13,17 +14,21 @@ namespace ossaTool
             InitializeComponent();
         }
 
-        private String errorConnection = "連線失敗";
-        private String successConnection = "連線正常";
+        private String error = "失敗 :(";
+        private String success = "成功 :)";
+
         private String connecting = "連線中";
-        private String connectionLog = "狀態異常!\r\n請排除硬體問題再進行後續燒機";
+        private String connectionErrLog = "狀態異常!\r\n請排除硬體問題再進行後續燒機";
         private bool connectionStatus = false;
         private String adbLog = "";
 
-        private String errorQFIL = "燒機失敗";
-        private String successQFIL = "燒機成功";
+        private String rebootEdling = "切換中";
+        private String rebootEdlErrLog = "切換異常!\r\n請排除硬體問題再進行後續燒機";
+        private bool rebootEdlStatus = false;
+        private String rebootEdlSuccessLog = "切換成功!\r\n可進行後續燒機";
+
         private String qfiling = "燒機中";
-        private String qfilLog = "狀態異常!\r\n請確認硬體是否異常\r\n請確認 USB/網路線是否脫落";
+        private String qfilErrLog = "狀態異常!\r\n請確認硬體是否異常\r\n請確認 USB/網路線是否脫落";
         private bool qfilSuccessful = false;
 
         private void button1_Click(object sender, EventArgs e)
@@ -35,7 +40,12 @@ namespace ossaTool
             txtLog.Text = "Still checking....\r\n";
         }
 
-        private void connectionProcess(DoWorkEventArgs e)
+        private void bgWorkerConnection_DoWork(object sender, DoWorkEventArgs e)
+        {
+            connectionProcess(e,false);
+        }
+
+        private void connectionProcess(DoWorkEventArgs e, bool edlProcess)
         {
             ProcessStartInfo psi = new ProcessStartInfo();
             psi.FileName = "adb.exe";
@@ -52,25 +62,31 @@ namespace ossaTool
                 p.StartInfo = psi;
                 p.Start();
                 p.StandardInput.WriteLine("adb devices");
-                String result = p.StandardOutput.ReadToEnd();
-
+                adbLog = p.StandardOutput.ReadToEnd();
                 p.Close();
-                if (rgx.Matches(result).Count>1)
+                if (rgx.Matches(adbLog).Count == 1 && edlProcess)
                 {
-                    adbLog = result;
+                    bgWorkerEdl.ReportProgress(100);
+                    rebootEdlStatus = true;
+                    e.Cancel = true;
+                    break;
+
+                }
+                else if( rgx.Matches(adbLog).Count > 1 && !edlProcess)
+                {
                     bgWorkerConnection.ReportProgress(100);
                     connectionStatus = true;
                     e.Cancel = true;
                     break;
                 }
                 System.Threading.Thread.Sleep(300);
-                bgWorkerConnection.ReportProgress(j);
+                if (edlProcess) {
+                    bgWorkerEdl.ReportProgress(j);
+                }
+                else {
+                    bgWorkerConnection.ReportProgress(j);
+                }
             }
-        }
-
-        private void bgWorkerConnection_DoWork(object sender, DoWorkEventArgs e)
-        {
-            connectionProcess(e);
         }
 
         private void bgWorkerConnection_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -83,17 +99,66 @@ namespace ossaTool
             btn1ConnectCheck.Enabled = true;
             if (connectionStatus)
             {
-                txt1ConnectionStatus.Text = successConnection;
-                btnQFIL.Enabled = true;
+                txt1ConnectionStatus.Text = success;
+                btnEdl.Enabled = true;
                 txtLog.Text = adbLog;
             }
             else
             {
-                txt1ConnectionStatus.Text = errorConnection;
-                btnQFIL.Enabled = false;
-                txtLog.Text = connectionLog;
+                txt1ConnectionStatus.Text = error;
+                btnEdl.Enabled = false;
+                txtLog.Text = connectionErrLog;
             }
         }
+
+        private void btnEdl_Click(object sender, EventArgs e)
+        {
+            txt1EdlStatus.Text = rebootEdling;
+            btnEdl.Enabled = false;
+            rebootEdlStatus = false;
+            ProcessStartInfo psi = new ProcessStartInfo();
+            psi.FileName = "adb.exe";
+            psi.Arguments = "reboot edl";
+            psi.RedirectStandardError = true;
+            psi.RedirectStandardInput = true;
+            psi.RedirectStandardOutput = true;
+            psi.UseShellExecute = false;
+            psi.CreateNoWindow = true;
+            Process p = new Process();
+            p.StartInfo = psi;
+            p.Start();
+            p.StandardInput.WriteLine("adb reboot edl");
+            p.Close();
+            bgWorkerEdl.RunWorkerAsync();
+        }
+
+        private void bgWorkerEdl_DoWork(object sender, DoWorkEventArgs e)
+        {
+            connectionProcess(e,true);
+        }
+
+        private void bgWorkerEdl_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            pgBarEdl.Value = e.ProgressPercentage;
+        }
+
+        private void bgWorkerEdl_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            btnEdl.Enabled = true;
+            if (rebootEdlStatus)
+            {
+                txt1EdlStatus.Text = success;
+                btnQFIL.Enabled = true;
+                txtLog.Text = rebootEdlSuccessLog;
+            }
+            else
+            {
+                txt1EdlStatus.Text = error;
+                btnQFIL.Enabled = false;
+                txtLog.Text = rebootEdlErrLog;
+            }
+        }
+
         private void btnQFIL_Click(object sender, EventArgs e)
         {
             txt1QFILStatus.Text = qfiling;
@@ -103,21 +168,19 @@ namespace ossaTool
 
         private void qFILProcess()
         {
-            //todo add script here
-            //for (int j = 0; j < 100; j++)
-            //{
-            //    System.Threading.Thread.Sleep(5);
-            //    bgWorkerQFIL.ReportProgress(j);
-            //}
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
+            Process p = new Process();
             p.StartInfo.UseShellExecute = false;
-            p.StartInfo.CreateNoWindow = false;
+            p.StartInfo.CreateNoWindow = true;
             p.StartInfo.FileName = "D://QFIL_Helper/flash_images_and_validate.bat"; 
             p.StartInfo.RedirectStandardError = true;
             p.StartInfo.RedirectStandardInput = true;
             p.StartInfo.RedirectStandardOutput = true;
-
             p.Start();
+            for (int j = 0; j < 100; j++)
+            {
+                Thread.Sleep(5);
+                bgWorkerQFIL.ReportProgress(j);
+            }
             qfilSuccessful = true;
         }
 
@@ -137,12 +200,12 @@ namespace ossaTool
             btnQFIL.Enabled = true;
             if (qfilSuccessful)
             {
-                txt1QFILStatus.Text = successQFIL;
+                txt1QFILStatus.Text = success;
             }
             else
             {
-                txt1QFILStatus.Text = errorQFIL;
-                txtLog.Text = qfilLog;
+                txt1QFILStatus.Text = error;
+                txtLog.Text = qfilErrLog;
             }
         }
 
@@ -160,5 +223,6 @@ namespace ossaTool
             p.Start();
         }
 
+       
     }
 }
