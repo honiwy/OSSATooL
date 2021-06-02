@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.IO;
+
 
 namespace ossaTool
 {
@@ -31,6 +33,11 @@ namespace ossaTool
         private String qfilErrLog = "狀態異常!\r\n請確認硬體是否異常\r\n請確認 USB/網路線是否脫落";
         private bool qfilSuccessful = false;
 
+        //@"D:\OSSA_new\ossaTool\adb\adb.exe";
+        private String adbPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\adb\\adb.exe");
+        //@"D:\OSSA_new\ossaTool\flash_images_and_validate.bat";
+        private String qfilPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\flash_images_and_validate.bat");
+
         private void button1_Click(object sender, EventArgs e)
         {
             txt1ConnectionStatus.Text = connecting;
@@ -48,7 +55,7 @@ namespace ossaTool
         private void connectionProcess(DoWorkEventArgs e, bool edlProcess)
         {
             ProcessStartInfo psi = new ProcessStartInfo();
-            psi.FileName = "adb.exe";
+            psi.FileName = adbPath;
             psi.Arguments = "devices";
             psi.RedirectStandardError = true;
             psi.RedirectStandardInput = true;
@@ -79,7 +86,7 @@ namespace ossaTool
                     e.Cancel = true;
                     break;
                 }
-                System.Threading.Thread.Sleep(300);
+                Thread.Sleep(300);
                 if (edlProcess) {
                     bgWorkerEdl.ReportProgress(j);
                 }
@@ -117,7 +124,7 @@ namespace ossaTool
             btnEdl.Enabled = false;
             rebootEdlStatus = false;
             ProcessStartInfo psi = new ProcessStartInfo();
-            psi.FileName = "adb.exe";
+            psi.FileName = adbPath;
             psi.Arguments = "reboot edl";
             psi.RedirectStandardError = true;
             psi.RedirectStandardInput = true;
@@ -171,14 +178,14 @@ namespace ossaTool
             Process p = new Process();
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.FileName = "D://QFIL_Helper/flash_images_and_validate.bat"; 
+            p.StartInfo.FileName = qfilPath; 
             p.StartInfo.RedirectStandardError = true;
             p.StartInfo.RedirectStandardInput = true;
             p.StartInfo.RedirectStandardOutput = true;
             p.Start();
             for (int j = 0; j < 100; j++)
             {
-                Thread.Sleep(5);
+                Thread.Sleep(1500);
                 bgWorkerQFIL.ReportProgress(j);
             }
             qfilSuccessful = true;
@@ -222,7 +229,6 @@ namespace ossaTool
 
             p.Start();
         }
-
        
     }
 }

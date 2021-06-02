@@ -13,3 +13,4 @@ D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.pdb
 D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.genruntimeconfig.cache
 D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.MainForm.resources
 D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.csprojAssemblyReference.cache
+D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.Properties.Resources.resources
