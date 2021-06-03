@@ -7,11 +7,7 @@ SET QFIL_LOG_PATH=C:\QFIL\log\flat_log.txt
 SET QFIL_COM_PORT=7
 
 SET TARGET_FW_VER=Cabello_OSSA_130s_2021_01_27_133_debug
-<<<<<<< HEAD
-SET FW_PATH=C:\Users\avc\Desktop\Cabello_SR2_2021_05_03_62_release_Flat
-=======
 SET FW_PATH=C:\Users\avc\Desktop\Cabello_SR2_2021_05_06_66_release_Flat
->>>>>>> 445ad1982fefbb42fbe62933601e7532b1589a5e
 
 SET TARGET_SKU_ID=Generic
 

@@ -55,7 +55,7 @@ namespace ossaTool
         private void connectionProcess(DoWorkEventArgs e, bool edlProcess)
         {
             ProcessStartInfo psi = new ProcessStartInfo();
-            psi.FileName = "adb.exe";
+            psi.FileName = adbPath;
             psi.Arguments = "devices";
             psi.RedirectStandardError = true;
             psi.RedirectStandardInput = true;
