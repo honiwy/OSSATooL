@@ -173,33 +173,64 @@ namespace ossaTool
             bgWorkerQFIL.RunWorkerAsync();
         }
 
-        private void qFILProcess()
+        private void qFILProcess(DoWorkEventArgs e)
         {
             Process p = new Process();
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.FileName = qfilPath; 
+            p.StartInfo.FileName = qfilPath;
+            //Fixme : should let user select qfil folder
+            //p.StartInfo.ArgumentList.Add("-Mode=3");
+            //p.StartInfo.ArgumentList.Add("-downloadflat");
+            //p.StartInfo.ArgumentList.Add("-COM=7");
+            //p.StartInfo.ArgumentList.Add("-Programmer=true;\"\"\"C:\\Users\\avc\\Desktop\\Cabello_SR2_2021_05_06_66_release_Flat\\emmc\\prog_firehose_ddr.elf\"\"\"");
+            //p.StartInfo.ArgumentList.Add("-deviceType=\"\"\"emmc\"\"\"");
+            //p.StartInfo.ArgumentList.Add("-VALIDATIONMODE=2");
+            //p.StartInfo.ArgumentList.Add("-SWITCHTOFIREHOSETIMEOUT=50");
+            //p.StartInfo.ArgumentList.Add("-RESETTIMEOUT=500");
+            //p.StartInfo.ArgumentList.Add("-RESETDELAYTIME=5");
+            //p.StartInfo.ArgumentList.Add("-RESETAFTERDOWNLOAD=true");
+            //p.StartInfo.ArgumentList.Add("-MaxPayloadSizeToTargetInBytes=true;49152");
+            //p.StartInfo.ArgumentList.Add("-searchpath=\"\"\"C:\\Users\\avc\\Desktop\\Cabello_SR2_2021_05_06_66_release_Flat\\emmc\"\"\"");
+            //p.StartInfo.ArgumentList.Add("-Rawprogram=\"\"\"rawprogram_unsparse.xml\"\"\"");
+            //p.StartInfo.ArgumentList.Add("-Patch=\"\"\"patch0.xml\"\"\"");
+            //p.StartInfo.ArgumentList.Add("-logfilepath=\"\"\"C:\\QFIL\\log\\flat_log.txt\"\"\"");
             p.StartInfo.RedirectStandardError = true;
             p.StartInfo.RedirectStandardInput = true;
             p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.UseShellExecute = false;
             p.Start();
+            p.Close();
             for (int j = 0; j < 100; j++)
             {
-                Thread.Sleep(1500);
+                Thread.Sleep(1800);
                 bgWorkerQFIL.ReportProgress(j);
+                if (qfilSuccessful)
+                {
+                    bgWorkerQFIL.ReportProgress(100);
+                    e.Cancel = true;
+                    break;
+                }
+                    
             }
-            qfilSuccessful = true;
         }
-
 
         private void bgWorkerQFIL_DoWork(object sender, DoWorkEventArgs e)
         {
-            qFILProcess();
+            qFILProcess(e);
         }
 
         private void bgWorkerQFIL_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             pgBarQFIL.Value = e.ProgressPercentage;
+
+            Regex rgx = new Regex("Finish Download");
+            String log = File.ReadAllText("C:\\QFIL\\log\\flat_log.txt");
+            txtLog.Text = log;
+            txtLog.SelectionStart = txtLog.TextLength;
+            txtLog.ScrollToCaret();
+            if (rgx.Matches(log).Count == 1)
+                qfilSuccessful = true;
         }
 
         private void bgWorkerQFIL_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -229,6 +260,7 @@ namespace ossaTool
 
             p.Start();
         }
+
        
     }
 }

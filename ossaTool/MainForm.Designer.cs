@@ -83,17 +83,17 @@ namespace ossaTool
             // 
             // txt1EdlStatus
             // 
-            this.txt1EdlStatus.Location = new System.Drawing.Point(364, 80);
+            this.txt1EdlStatus.Location = new System.Drawing.Point(206, 80);
             this.txt1EdlStatus.Name = "txt1EdlStatus";
             this.txt1EdlStatus.ReadOnly = true;
-            this.txt1EdlStatus.Size = new System.Drawing.Size(240, 23);
+            this.txt1EdlStatus.Size = new System.Drawing.Size(68, 23);
             this.txt1EdlStatus.TabIndex = 10;
             // 
             // pgBarEdl
             // 
-            this.pgBarEdl.Location = new System.Drawing.Point(206, 80);
+            this.pgBarEdl.Location = new System.Drawing.Point(298, 80);
             this.pgBarEdl.Name = "pgBarEdl";
-            this.pgBarEdl.Size = new System.Drawing.Size(139, 23);
+            this.pgBarEdl.Size = new System.Drawing.Size(411, 23);
             this.pgBarEdl.Step = 1;
             this.pgBarEdl.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.pgBarEdl.TabIndex = 9;
@@ -114,38 +114,38 @@ namespace ossaTool
             // 
             // txtLog
             // 
-            this.txtLog.Location = new System.Drawing.Point(206, 184);
+            this.txtLog.Location = new System.Drawing.Point(65, 166);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(398, 130);
+            this.txtLog.Size = new System.Drawing.Size(644, 235);
             this.txtLog.TabIndex = 7;
             // 
             // pgBarQFIL
             // 
-            this.pgBarQFIL.Location = new System.Drawing.Point(206, 122);
+            this.pgBarQFIL.Location = new System.Drawing.Point(298, 123);
             this.pgBarQFIL.Name = "pgBarQFIL";
-            this.pgBarQFIL.Size = new System.Drawing.Size(139, 23);
+            this.pgBarQFIL.Size = new System.Drawing.Size(411, 23);
             this.pgBarQFIL.Step = 1;
             this.pgBarQFIL.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.pgBarQFIL.TabIndex = 6;
             // 
             // pgBarConnection
             // 
-            this.pgBarConnection.Location = new System.Drawing.Point(206, 41);
+            this.pgBarConnection.Location = new System.Drawing.Point(298, 41);
             this.pgBarConnection.Name = "pgBarConnection";
-            this.pgBarConnection.Size = new System.Drawing.Size(139, 23);
+            this.pgBarConnection.Size = new System.Drawing.Size(411, 23);
             this.pgBarConnection.Step = 1;
             this.pgBarConnection.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.pgBarConnection.TabIndex = 5;
             // 
             // txt1QFILStatus
             // 
-            this.txt1QFILStatus.Location = new System.Drawing.Point(364, 123);
+            this.txt1QFILStatus.Location = new System.Drawing.Point(206, 123);
             this.txt1QFILStatus.Name = "txt1QFILStatus";
             this.txt1QFILStatus.ReadOnly = true;
-            this.txt1QFILStatus.Size = new System.Drawing.Size(240, 23);
+            this.txt1QFILStatus.Size = new System.Drawing.Size(68, 23);
             this.txt1QFILStatus.TabIndex = 3;
             // 
             // btnQFIL
@@ -176,10 +176,10 @@ namespace ossaTool
             // 
             // txt1ConnectionStatus
             // 
-            this.txt1ConnectionStatus.Location = new System.Drawing.Point(364, 42);
+            this.txt1ConnectionStatus.Location = new System.Drawing.Point(206, 41);
             this.txt1ConnectionStatus.Name = "txt1ConnectionStatus";
             this.txt1ConnectionStatus.ReadOnly = true;
-            this.txt1ConnectionStatus.Size = new System.Drawing.Size(240, 23);
+            this.txt1ConnectionStatus.Size = new System.Drawing.Size(68, 23);
             this.txt1ConnectionStatus.TabIndex = 0;
             // 
             // tabPage2
@@ -221,6 +221,7 @@ namespace ossaTool
             this.Controls.Add(this.tabControlMenu);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "OSSA tool";
             this.tabControlMenu.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
