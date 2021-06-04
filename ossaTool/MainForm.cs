@@ -38,6 +38,10 @@ namespace ossaTool
         //@"D:\OSSA_new\ossaTool\flash_images_and_validate.bat";
         private String qfilPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\flash_images_and_validate.bat");
 
+        private CountDownTimer timer = new CountDownTimer();
+        private String countDownText = "請稍後, DHCP 分配 IP 中 ";
+
+
         private void button1_Click(object sender, EventArgs e)
         {
             txt1ConnectionStatus.Text = connecting;
@@ -239,6 +243,7 @@ namespace ossaTool
             if (qfilSuccessful)
             {
                 txt1QFILStatus.Text = success;
+                MessageBox.Show("拔除 USB 線後, 點選 Step 2");
             }
             else
             {
@@ -261,6 +266,50 @@ namespace ossaTool
             p.Start();
         }
 
-       
+        private void tabPage2_Enter(object sender, EventArgs e)
+        {
+            timer.SetTime(0, 5);
+            timer.Start();
+            timer.TimeChanged += () => txtCountDown.Text = timer.TimeLeftMsStr;
+            timer.StepMs = 77; // for nice milliseconds time switch
+            if(timer.TimeLeft== TimeSpan.FromMilliseconds(0))
+            {
+                MessageBox.Show("");
+            };
+        }
+
+        private void tabPage2_Leave(object sender, EventArgs e)
+        {
+            timer.Stop();
+        }
+
+        private void btnGetIP_Click(object sender, EventArgs e)
+        {
+            ProcessStartInfo psi = new ProcessStartInfo();
+            psi.FileName = adbPath;
+            psi.Arguments = "logcat -d | findstr LinkAddresses";
+            psi.RedirectStandardError = true;
+            psi.RedirectStandardInput = true;
+            psi.RedirectStandardOutput = true;
+            psi.UseShellExecute = false;
+            psi.CreateNoWindow = true;
+            Process p = new Process();
+            p.StartInfo = psi;
+            p.Start();
+            p.StandardInput.WriteLine("adb logcat -d | findstr LinkAddresses");
+            adbLog = p.StandardOutput.ReadToEnd();
+            p.Close();
+            Regex rgx = new Regex(@"LinkAddresses.+?(?=\])");
+            MatchCollection matchCollection = rgx.Matches(adbLog);
+            if (matchCollection.Count > 0)
+            {
+                txtLog2.Text = matchCollection[0].ToString();
+            }
+            else
+            {
+                txtLog2.Text = "Oops! No IP address got found.";
+            }
+
+        }
     }
 }
