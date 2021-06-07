@@ -43,6 +43,8 @@ namespace ossaTool
             this.btn1ConnectCheck = new System.Windows.Forms.Button();
             this.txt1ConnectionStatus = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btnWriteFile = new System.Windows.Forms.Button();
+            this.lblDHCP = new System.Windows.Forms.Label();
             this.txtLog2 = new System.Windows.Forms.TextBox();
             this.btnGetIP = new System.Windows.Forms.Button();
             this.lblPluginHint = new System.Windows.Forms.Label();
@@ -50,7 +52,7 @@ namespace ossaTool
             this.bgWorkerConnection = new System.ComponentModel.BackgroundWorker();
             this.bgWorkerQFIL = new System.ComponentModel.BackgroundWorker();
             this.bgWorkerEdl = new System.ComponentModel.BackgroundWorker();
-            this.lblDHCP = new System.Windows.Forms.Label();
+            this.btnUpdateCSV = new System.Windows.Forms.Button();
             this.tabControlMenu.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -69,7 +71,7 @@ namespace ossaTool
             // 
             // tabPage1
             // 
-            this.tabPage1.BackColor = System.Drawing.Color.DarkSeaGreen;
+            this.tabPage1.BackColor = System.Drawing.Color.LightSlateGray;
             this.tabPage1.Controls.Add(this.txt1EdlStatus);
             this.tabPage1.Controls.Add(this.pgBarEdl);
             this.tabPage1.Controls.Add(this.btnEdl);
@@ -106,7 +108,7 @@ namespace ossaTool
             // 
             // btnEdl
             // 
-            this.btnEdl.BackColor = System.Drawing.Color.MistyRose;
+            this.btnEdl.BackColor = System.Drawing.Color.Tan;
             this.btnEdl.Enabled = false;
             this.btnEdl.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnEdl.ForeColor = System.Drawing.SystemColors.ControlText;
@@ -156,7 +158,7 @@ namespace ossaTool
             // 
             // btnQFIL
             // 
-            this.btnQFIL.BackColor = System.Drawing.Color.MistyRose;
+            this.btnQFIL.BackColor = System.Drawing.Color.LightSteelBlue;
             this.btnQFIL.Enabled = false;
             this.btnQFIL.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnQFIL.Location = new System.Drawing.Point(68, 124);
@@ -170,7 +172,7 @@ namespace ossaTool
             // 
             // btn1ConnectCheck
             // 
-            this.btn1ConnectCheck.BackColor = System.Drawing.Color.MistyRose;
+            this.btn1ConnectCheck.BackColor = System.Drawing.Color.RosyBrown;
             this.btn1ConnectCheck.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btn1ConnectCheck.Location = new System.Drawing.Point(68, 42);
             this.btn1ConnectCheck.Name = "btn1ConnectCheck";
@@ -190,7 +192,9 @@ namespace ossaTool
             // 
             // tabPage2
             // 
-            this.tabPage2.BackColor = System.Drawing.Color.Moccasin;
+            this.tabPage2.BackColor = System.Drawing.Color.LightSlateGray;
+            this.tabPage2.Controls.Add(this.btnUpdateCSV);
+            this.tabPage2.Controls.Add(this.btnWriteFile);
             this.tabPage2.Controls.Add(this.lblDHCP);
             this.tabPage2.Controls.Add(this.txtLog2);
             this.tabPage2.Controls.Add(this.btnGetIP);
@@ -205,28 +209,51 @@ namespace ossaTool
             this.tabPage2.Enter += new System.EventHandler(this.tabPage2_Enter);
             this.tabPage2.Leave += new System.EventHandler(this.tabPage2_Leave);
             // 
+            // btnWriteFile
+            // 
+            this.btnWriteFile.BackColor = System.Drawing.Color.Tan;
+            this.btnWriteFile.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnWriteFile.Location = new System.Drawing.Point(61, 163);
+            this.btnWriteFile.Name = "btnWriteFile";
+            this.btnWriteFile.Size = new System.Drawing.Size(107, 23);
+            this.btnWriteFile.TabIndex = 5;
+            this.btnWriteFile.Text = "更新檔案(.txt)";
+            this.btnWriteFile.UseVisualStyleBackColor = false;
+            this.btnWriteFile.Click += new System.EventHandler(this.btnWriteFile_Click);
+            // 
+            // lblDHCP
+            // 
+            this.lblDHCP.AutoSize = true;
+            this.lblDHCP.Location = new System.Drawing.Point(61, 42);
+            this.lblDHCP.Name = "lblDHCP";
+            this.lblDHCP.Size = new System.Drawing.Size(151, 15);
+            this.lblDHCP.TabIndex = 4;
+            this.lblDHCP.Text = "請稍後, DHCP 分配 IP 中...";
+            // 
             // txtLog2
             // 
-            this.txtLog2.Location = new System.Drawing.Point(157, 66);
+            this.txtLog2.Location = new System.Drawing.Point(218, 79);
             this.txtLog2.Multiline = true;
             this.txtLog2.Name = "txtLog2";
-            this.txtLog2.Size = new System.Drawing.Size(470, 183);
+            this.txtLog2.Size = new System.Drawing.Size(409, 64);
             this.txtLog2.TabIndex = 3;
             // 
             // btnGetIP
             // 
-            this.btnGetIP.Location = new System.Drawing.Point(61, 67);
+            this.btnGetIP.BackColor = System.Drawing.Color.RosyBrown;
+            this.btnGetIP.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnGetIP.Location = new System.Drawing.Point(61, 79);
             this.btnGetIP.Name = "btnGetIP";
-            this.btnGetIP.Size = new System.Drawing.Size(75, 23);
+            this.btnGetIP.Size = new System.Drawing.Size(107, 23);
             this.btnGetIP.TabIndex = 2;
-            this.btnGetIP.Text = "取得 IP";
-            this.btnGetIP.UseVisualStyleBackColor = true;
+            this.btnGetIP.Text = "取得裝置資訊";
+            this.btnGetIP.UseVisualStyleBackColor = false;
             this.btnGetIP.Click += new System.EventHandler(this.btnGetIP_Click);
             // 
             // lblPluginHint
             // 
             this.lblPluginHint.AutoSize = true;
-            this.lblPluginHint.Location = new System.Drawing.Point(298, 27);
+            this.lblPluginHint.Location = new System.Drawing.Point(298, 42);
             this.lblPluginHint.Name = "lblPluginHint";
             this.lblPluginHint.Size = new System.Drawing.Size(329, 15);
             this.lblPluginHint.TabIndex = 1;
@@ -234,7 +261,7 @@ namespace ossaTool
             // 
             // txtCountDown
             // 
-            this.txtCountDown.Location = new System.Drawing.Point(218, 24);
+            this.txtCountDown.Location = new System.Drawing.Point(218, 39);
             this.txtCountDown.Name = "txtCountDown";
             this.txtCountDown.ReadOnly = true;
             this.txtCountDown.Size = new System.Drawing.Size(74, 23);
@@ -261,14 +288,16 @@ namespace ossaTool
             this.bgWorkerEdl.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgWorkerEdl_ProgressChanged);
             this.bgWorkerEdl.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgWorkerEdl_RunWorkerCompleted);
             // 
-            // lblDHCP
+            // btnUpdateCSV
             // 
-            this.lblDHCP.AutoSize = true;
-            this.lblDHCP.Location = new System.Drawing.Point(61, 27);
-            this.lblDHCP.Name = "lblDHCP";
-            this.lblDHCP.Size = new System.Drawing.Size(151, 15);
-            this.lblDHCP.TabIndex = 4;
-            this.lblDHCP.Text = "請稍後, DHCP 分配 IP 中...";
+            this.btnUpdateCSV.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.btnUpdateCSV.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnUpdateCSV.Location = new System.Drawing.Point(61, 248);
+            this.btnUpdateCSV.Name = "btnUpdateCSV";
+            this.btnUpdateCSV.Size = new System.Drawing.Size(107, 23);
+            this.btnUpdateCSV.TabIndex = 6;
+            this.btnUpdateCSV.Text = "更新檔案(.csv)";
+            this.btnUpdateCSV.UseVisualStyleBackColor = false;
             // 
             // MainForm
             // 
@@ -292,7 +321,6 @@ namespace ossaTool
         #endregion
 
         private System.Windows.Forms.TabControl tabControlMenu;
-        private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TextBox txt1ConnectionStatus;
         private System.Windows.Forms.Button btn1ConnectCheck;
@@ -307,11 +335,14 @@ namespace ossaTool
         private System.Windows.Forms.ProgressBar pgBarEdl;
         private System.Windows.Forms.Button btnEdl;
         private System.ComponentModel.BackgroundWorker bgWorkerEdl;
-        private System.Windows.Forms.TextBox txtCountDown;
-        private System.Windows.Forms.Label lblPluginHint;
-        private System.Windows.Forms.Button btnGetIP;
-        private System.Windows.Forms.TextBox txtLog2;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.Button btnWriteFile;
         private System.Windows.Forms.Label lblDHCP;
+        private System.Windows.Forms.TextBox txtLog2;
+        private System.Windows.Forms.Button btnGetIP;
+        private System.Windows.Forms.Label lblPluginHint;
+        private System.Windows.Forms.TextBox txtCountDown;
+        private System.Windows.Forms.Button btnUpdateCSV;
     }
 }
 

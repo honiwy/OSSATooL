@@ -14,33 +14,46 @@ namespace ossaTool
         public MainForm()
         {
             InitializeComponent();
+            p = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = adbPath,
+                    RedirectStandardError = true,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
         }
 
-        private String error = "失敗 :(";
-        private String success = "成功 :)";
+        private string error = "失敗 :(";
+        private string success = "成功 :)";
 
-        private String connecting = "連線中";
-        private String connectionErrLog = "狀態異常!\r\n請排除硬體問題再進行後續燒機";
+        private string connecting = "連線中";
+        private string connectionErrLog = "狀態異常!\r\n請排除硬體問題再進行後續燒機";
         private bool connectionStatus = false;
-        private String adbLog = "";
+        private string adbLog = "";
 
-        private String rebootEdling = "切換中";
-        private String rebootEdlErrLog = "切換異常!\r\n請排除硬體問題再進行後續燒機";
+        private string rebootEdling = "切換中";
+        private string rebootEdlErrLog = "切換異常!\r\n請排除硬體問題再進行後續燒機";
         private bool rebootEdlStatus = false;
-        private String rebootEdlSuccessLog = "切換成功!\r\n可進行後續燒機";
+        private string rebootEdlSuccessLog = "切換成功!\r\n可進行後續燒機";
 
-        private String qfiling = "燒機中";
-        private String qfilErrLog = "狀態異常!\r\n請確認硬體是否異常\r\n請確認 USB/網路線是否脫落";
+        private string qfiling = "燒機中";
+        private string qfilErrLog = "狀態異常!\r\n請確認硬體是否異常\r\n請確認 USB/網路線是否脫落";
         private bool qfilSuccessful = false;
 
         //@"D:\OSSA_new\ossaTool\adb\adb.exe";
-        private String adbPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\adb\\adb.exe");
+        private string adbPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\adb\\adb.exe");
         //@"D:\OSSA_new\ossaTool\flash_images_and_validate.bat";
-        private String qfilPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\flash_images_and_validate.bat");
+        private string qfilPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\flash_images_and_validate.bat");
 
         private CountDownTimer timer = new CountDownTimer();
-        private String countDownText = "請稍後, DHCP 分配 IP 中 ";
-
+        private string device_sn = "";
+        private string mac_address = "";
+        private Process p;
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -58,19 +71,10 @@ namespace ossaTool
 
         private void connectionProcess(DoWorkEventArgs e, bool edlProcess)
         {
-            ProcessStartInfo psi = new ProcessStartInfo();
-            psi.FileName = adbPath;
-            psi.Arguments = "devices";
-            psi.RedirectStandardError = true;
-            psi.RedirectStandardInput = true;
-            psi.RedirectStandardOutput = true;
-            psi.UseShellExecute = false;
-            psi.CreateNoWindow = true;
             Regex rgx = new Regex("device");
             for (int j = 0; j < 100; j++)
             {
-                Process p = new Process();
-                p.StartInfo = psi;
+                p.StartInfo.Arguments = "devices";
                 p.Start();
                 p.StandardInput.WriteLine("adb devices");
                 adbLog = p.StandardOutput.ReadToEnd();
@@ -127,16 +131,7 @@ namespace ossaTool
             txt1EdlStatus.Text = rebootEdling;
             btnEdl.Enabled = false;
             rebootEdlStatus = false;
-            ProcessStartInfo psi = new ProcessStartInfo();
-            psi.FileName = adbPath;
-            psi.Arguments = "reboot edl";
-            psi.RedirectStandardError = true;
-            psi.RedirectStandardInput = true;
-            psi.RedirectStandardOutput = true;
-            psi.UseShellExecute = false;
-            psi.CreateNoWindow = true;
-            Process p = new Process();
-            p.StartInfo = psi;
+            p.StartInfo.Arguments = "reboot edl";
             p.Start();
             p.StandardInput.WriteLine("adb reboot edl");
             p.Close();
@@ -179,10 +174,17 @@ namespace ossaTool
 
         private void qFILProcess(DoWorkEventArgs e)
         {
-            Process p = new Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.FileName = qfilPath;
+            Process pbat = new Process() { 
+                StartInfo = new ProcessStartInfo()
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    FileName = qfilPath,
+                    RedirectStandardError = true,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                }
+            };
             //Fixme : should let user select qfil folder
             //p.StartInfo.ArgumentList.Add("-Mode=3");
             //p.StartInfo.ArgumentList.Add("-downloadflat");
@@ -199,12 +201,8 @@ namespace ossaTool
             //p.StartInfo.ArgumentList.Add("-Rawprogram=\"\"\"rawprogram_unsparse.xml\"\"\"");
             //p.StartInfo.ArgumentList.Add("-Patch=\"\"\"patch0.xml\"\"\"");
             //p.StartInfo.ArgumentList.Add("-logfilepath=\"\"\"C:\\QFIL\\log\\flat_log.txt\"\"\"");
-            p.StartInfo.RedirectStandardError = true;
-            p.StartInfo.RedirectStandardInput = true;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.UseShellExecute = false;
-            p.Start();
-            p.Close();
+            pbat.Start();
+            pbat.Close();
             for (int j = 0; j < 100; j++)
             {
                 Thread.Sleep(1800);
@@ -254,7 +252,7 @@ namespace ossaTool
 
         private void adbCommand()
         {
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
+            Process p = new Process();
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = false;
             p.StartInfo.FileName = "cmd.exe";
@@ -285,31 +283,48 @@ namespace ossaTool
 
         private void btnGetIP_Click(object sender, EventArgs e)
         {
-            ProcessStartInfo psi = new ProcessStartInfo();
-            psi.FileName = adbPath;
-            psi.Arguments = "logcat -d | findstr LinkAddresses";
-            psi.RedirectStandardError = true;
-            psi.RedirectStandardInput = true;
-            psi.RedirectStandardOutput = true;
-            psi.UseShellExecute = false;
-            psi.CreateNoWindow = true;
-            Process p = new Process();
-            p.StartInfo = psi;
+            #region get IP address
+            p.StartInfo.Arguments = "logcat -d | findstr LinkAddresses";
             p.Start();
             p.StandardInput.WriteLine("adb logcat -d | findstr LinkAddresses");
             adbLog = p.StandardOutput.ReadToEnd();
             p.Close();
-            Regex rgx = new Regex(@"LinkAddresses.+?(?=\])");
-            MatchCollection matchCollection = rgx.Matches(adbLog);
-            if (matchCollection.Count > 0)
-            {
-                txtLog2.Text = matchCollection[0].ToString();
-            }
-            else
-            {
-                txtLog2.Text = "Oops! No IP address got found.";
-            }
+            MatchCollection matchCollection = new Regex(@"LinkAddresses.+?(?=\])").Matches(adbLog);
+            txtLog2.Text = (matchCollection.Count > 0)? matchCollection[0].ToString(): "Oops! No IP address got found.";
+            #endregion
+
+            #region get device serial number
+            p.StartInfo.Arguments = "shell cat /avc_info/device_sn";
+            p.Start();
+            p.StandardInput.WriteLine("adb shell cat /avc_info/device_sn");
+            device_sn = p.StandardOutput.ReadToEnd().Replace("\n", "").Replace("\r", "");
+            p.Close();
+            txtLog2.Text += Environment.NewLine + "Serial number: [" + device_sn + "]";
+            #endregion
+
+            #region get device mac address
+            p.StartInfo.Arguments = "shell cat /avc_info/mac_address";
+            p.Start();
+            p.StandardInput.WriteLine("adb shell cat /avc_info/mac_address");
+            mac_address = p.StandardOutput.ReadToEnd().Replace("\n", "").Replace("\r", "");
+            p.Close();
+            txtLog2.Text += Environment.NewLine + "MAC address: [" + mac_address + "]";
+            #endregion
 
         }
+
+        private void btnWriteFile_Click(object sender, EventArgs e)
+        {
+            using (StreamWriter sw = new StreamWriter(@"D:\OSSA_new\ossaTool\test.txt", true))   
+            {
+                if (sw.BaseStream.Position == 0)
+                    sw.WriteLine("Date//Serial #//MAC address//Key");
+                sw.Write(DateTime.Now + "//");
+                sw.Write(device_sn + "//");
+                sw.Write(mac_address + "//");
+                sw.WriteLine("rgwgterhtyy/tyr");
+            }
+        }
+
     }
 }
