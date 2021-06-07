@@ -5,7 +5,8 @@ using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.IO;
-
+using Microsoft.Office.Interop.Excel;
+using Application = System.Windows.Forms.Application;
 
 namespace ossaTool
 {
@@ -28,6 +29,11 @@ namespace ossaTool
             };
         }
 
+        //@"D:\OSSA_new\ossaTool\adb\adb.exe";
+        private string adbPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\adb\\adb.exe");
+        //@"D:\OSSA_new\ossaTool\flash_images_and_validate.bat";
+        private string qfilPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\flash_images_and_validate.bat");
+
         private string error = "失敗 :(";
         private string success = "成功 :)";
 
@@ -45,10 +51,6 @@ namespace ossaTool
         private string qfilErrLog = "狀態異常!\r\n請確認硬體是否異常\r\n請確認 USB/網路線是否脫落";
         private bool qfilSuccessful = false;
 
-        //@"D:\OSSA_new\ossaTool\adb\adb.exe";
-        private string adbPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\adb\\adb.exe");
-        //@"D:\OSSA_new\ossaTool\flash_images_and_validate.bat";
-        private string qfilPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\flash_images_and_validate.bat");
 
         private CountDownTimer timer = new CountDownTimer();
         private string device_sn = "";
@@ -311,6 +313,11 @@ namespace ossaTool
             txtLog2.Text += Environment.NewLine + "MAC address: [" + mac_address + "]";
             #endregion
 
+            if (device_sn.Length != 0 && mac_address.Length != 0)
+            {
+                btnUpdateCSV.Enabled = true;
+                btnUpdateTXT.Enabled = true;
+            }
         }
 
         private void btnWriteFile_Click(object sender, EventArgs e)
@@ -319,12 +326,24 @@ namespace ossaTool
             {
                 if (sw.BaseStream.Position == 0)
                     sw.WriteLine("Date//Serial #//MAC address//Key");
-                sw.Write(DateTime.Now + "//");
+                sw.Write(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss") + "//");
                 sw.Write(device_sn + "//");
                 sw.Write(mac_address + "//");
                 sw.WriteLine("rgwgterhtyy/tyr");
             }
         }
 
+        private void btnUpdateCSV_Click(object sender, EventArgs e)
+        {
+            using (StreamWriter sw = new StreamWriter(new FileStream(@"D:\OSSA_new\ossaTool\test.csv", FileMode.Append, FileAccess.Write)))
+            {
+                if (sw.BaseStream.Position == 0)
+                {
+                    sw.WriteLine("sep=,");
+                    sw.WriteLine("Date,Serial #,MAC address,Key");
+                }
+                sw.WriteLine(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss") + ","+ device_sn + ","+ mac_address + ",rpa$$eijo0rD/w");
+            }
+        }
     }
 }

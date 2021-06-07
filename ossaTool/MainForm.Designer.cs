@@ -43,7 +43,8 @@ namespace ossaTool
             this.btn1ConnectCheck = new System.Windows.Forms.Button();
             this.txt1ConnectionStatus = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.btnWriteFile = new System.Windows.Forms.Button();
+            this.btnUpdateCSV = new System.Windows.Forms.Button();
+            this.btnUpdateTXT = new System.Windows.Forms.Button();
             this.lblDHCP = new System.Windows.Forms.Label();
             this.txtLog2 = new System.Windows.Forms.TextBox();
             this.btnGetIP = new System.Windows.Forms.Button();
@@ -52,7 +53,6 @@ namespace ossaTool
             this.bgWorkerConnection = new System.ComponentModel.BackgroundWorker();
             this.bgWorkerQFIL = new System.ComponentModel.BackgroundWorker();
             this.bgWorkerEdl = new System.ComponentModel.BackgroundWorker();
-            this.btnUpdateCSV = new System.Windows.Forms.Button();
             this.tabControlMenu.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -194,7 +194,7 @@ namespace ossaTool
             // 
             this.tabPage2.BackColor = System.Drawing.Color.LightSlateGray;
             this.tabPage2.Controls.Add(this.btnUpdateCSV);
-            this.tabPage2.Controls.Add(this.btnWriteFile);
+            this.tabPage2.Controls.Add(this.btnUpdateTXT);
             this.tabPage2.Controls.Add(this.lblDHCP);
             this.tabPage2.Controls.Add(this.txtLog2);
             this.tabPage2.Controls.Add(this.btnGetIP);
@@ -209,17 +209,31 @@ namespace ossaTool
             this.tabPage2.Enter += new System.EventHandler(this.tabPage2_Enter);
             this.tabPage2.Leave += new System.EventHandler(this.tabPage2_Leave);
             // 
-            // btnWriteFile
+            // btnUpdateCSV
             // 
-            this.btnWriteFile.BackColor = System.Drawing.Color.Tan;
-            this.btnWriteFile.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnWriteFile.Location = new System.Drawing.Point(61, 163);
-            this.btnWriteFile.Name = "btnWriteFile";
-            this.btnWriteFile.Size = new System.Drawing.Size(107, 23);
-            this.btnWriteFile.TabIndex = 5;
-            this.btnWriteFile.Text = "更新檔案(.txt)";
-            this.btnWriteFile.UseVisualStyleBackColor = false;
-            this.btnWriteFile.Click += new System.EventHandler(this.btnWriteFile_Click);
+            this.btnUpdateCSV.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.btnUpdateCSV.Enabled = false;
+            this.btnUpdateCSV.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnUpdateCSV.Location = new System.Drawing.Point(61, 214);
+            this.btnUpdateCSV.Name = "btnUpdateCSV";
+            this.btnUpdateCSV.Size = new System.Drawing.Size(107, 23);
+            this.btnUpdateCSV.TabIndex = 6;
+            this.btnUpdateCSV.Text = "更新檔案(.csv)";
+            this.btnUpdateCSV.UseVisualStyleBackColor = false;
+            this.btnUpdateCSV.Click += new System.EventHandler(this.btnUpdateCSV_Click);
+            // 
+            // btnUpdateTXT
+            // 
+            this.btnUpdateTXT.BackColor = System.Drawing.Color.Tan;
+            this.btnUpdateTXT.Enabled = false;
+            this.btnUpdateTXT.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnUpdateTXT.Location = new System.Drawing.Point(61, 163);
+            this.btnUpdateTXT.Name = "btnUpdateTXT";
+            this.btnUpdateTXT.Size = new System.Drawing.Size(107, 23);
+            this.btnUpdateTXT.TabIndex = 5;
+            this.btnUpdateTXT.Text = "更新檔案(.txt)";
+            this.btnUpdateTXT.UseVisualStyleBackColor = false;
+            this.btnUpdateTXT.Click += new System.EventHandler(this.btnWriteFile_Click);
             // 
             // lblDHCP
             // 
@@ -288,17 +302,6 @@ namespace ossaTool
             this.bgWorkerEdl.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgWorkerEdl_ProgressChanged);
             this.bgWorkerEdl.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgWorkerEdl_RunWorkerCompleted);
             // 
-            // btnUpdateCSV
-            // 
-            this.btnUpdateCSV.BackColor = System.Drawing.Color.LightSteelBlue;
-            this.btnUpdateCSV.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnUpdateCSV.Location = new System.Drawing.Point(61, 248);
-            this.btnUpdateCSV.Name = "btnUpdateCSV";
-            this.btnUpdateCSV.Size = new System.Drawing.Size(107, 23);
-            this.btnUpdateCSV.TabIndex = 6;
-            this.btnUpdateCSV.Text = "更新檔案(.csv)";
-            this.btnUpdateCSV.UseVisualStyleBackColor = false;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -336,7 +339,7 @@ namespace ossaTool
         private System.Windows.Forms.Button btnEdl;
         private System.ComponentModel.BackgroundWorker bgWorkerEdl;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.Button btnWriteFile;
+        private System.Windows.Forms.Button btnUpdateTXT;
         private System.Windows.Forms.Label lblDHCP;
         private System.Windows.Forms.TextBox txtLog2;
         private System.Windows.Forms.Button btnGetIP;

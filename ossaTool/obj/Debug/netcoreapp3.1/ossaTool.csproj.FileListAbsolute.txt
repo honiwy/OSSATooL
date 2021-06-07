@@ -14,3 +14,6 @@ D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.genruntimeconfig.cache
 D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.MainForm.resources
 D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.csprojAssemblyReference.cache
 D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.Properties.Resources.resources
+D:\OSSA_new\ossaTool\bin\Debug\netcoreapp3.1\Interop.Microsoft.Office.Interop.Excel.dll
+D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\Interop.Microsoft.Office.Interop.Excel.dll
+D:\OSSA_new\ossaTool\obj\Debug\netcoreapp3.1\ossaTool.csproj.ResolveComReference.cache
