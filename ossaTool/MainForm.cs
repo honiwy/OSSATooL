@@ -15,6 +15,7 @@ namespace ossaTool
         public MainForm()
         {
             InitializeComponent();
+            txtStoragePath.Text = Properties.Settings.Default.FileStoragePath;
             p = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -55,6 +56,7 @@ namespace ossaTool
         private CountDownTimer timer = new CountDownTimer();
         private string device_sn = "";
         private string mac_address = "";
+        private string key = "";
         private Process p;
 
         private void button1_Click(object sender, EventArgs e)
@@ -268,14 +270,10 @@ namespace ossaTool
 
         private void tabPage2_Enter(object sender, EventArgs e)
         {
-            timer.SetTime(0, 5);
+            timer.SetTime(0, 50);
             timer.Start();
             timer.TimeChanged += () => txtCountDown.Text = timer.TimeLeftMsStr;
             timer.StepMs = 77; // for nice milliseconds time switch
-            if(timer.TimeLeft== TimeSpan.FromMilliseconds(0))
-            {
-                MessageBox.Show("");
-            };
         }
 
         private void tabPage2_Leave(object sender, EventArgs e)
@@ -313,36 +311,139 @@ namespace ossaTool
             txtLog2.Text += Environment.NewLine + "MAC address: [" + mac_address + "]";
             #endregion
 
-            if (device_sn.Length != 0 && mac_address.Length != 0)
-            {
+            //if (device_sn.Length != 0 && mac_address.Length != 0)
+            //{
                 btnUpdateCSV.Enabled = true;
                 btnUpdateTXT.Enabled = true;
-            }
+            //}
         }
 
         private void btnWriteFile_Click(object sender, EventArgs e)
         {
-            using (StreamWriter sw = new StreamWriter(@"D:\OSSA_new\ossaTool\test.txt", true))   
+            string path = Properties.Settings.Default.FileStoragePath + "/deviceInfoLog.txt";
+            using (StreamWriter sw = new StreamWriter(path, true))   
             {
                 if (sw.BaseStream.Position == 0)
-                    sw.WriteLine("Date//Serial #//MAC address//Key");
+                    sw.WriteLine("Date//Serial #//MAC address//Keybox Dir//Key");
                 sw.Write(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss") + "//");
                 sw.Write(device_sn + "//");
                 sw.Write(mac_address + "//");
-                sw.WriteLine("rgwgterhtyy/tyr");
+                sw.Write("kb007//");
+                sw.WriteLine(key);
             }
         }
 
         private void btnUpdateCSV_Click(object sender, EventArgs e)
         {
-            using (StreamWriter sw = new StreamWriter(new FileStream(@"D:\OSSA_new\ossaTool\test.csv", FileMode.Append, FileAccess.Write)))
+            string path = Properties.Settings.Default.FileStoragePath + "/deviceInfoLog.csv";
+            using (StreamWriter sw = new StreamWriter(new FileStream(path, FileMode.Append, FileAccess.Write)))
             {
                 if (sw.BaseStream.Position == 0)
                 {
                     sw.WriteLine("sep=,");
-                    sw.WriteLine("Date,Serial #,MAC address,Key");
+                    sw.WriteLine("Date,Serial #,MAC address,Keybox Dir,Key");
                 }
-                sw.WriteLine(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss") + ","+ device_sn + ","+ mac_address + ",rpa$$eijo0rD/w");
+                sw.WriteLine(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss") + ","+ device_sn + ","+ mac_address + "," + "kb007," + key);
+            }
+        }
+
+        private void btnChangePermission_Click(object sender, EventArgs e)
+        {
+            p.StartInfo.Arguments = "root";
+            p.Start();
+            p.StandardInput.WriteLine("adb root");
+            p.Close();
+
+            p.StartInfo.Arguments = "shell echo '1' | qseecom_sample_client v smplap32 14 1";
+            p.Start();
+            p.StandardInput.WriteLine("adb shell echo '1' | qseecom_sample_client v smplap32 14 1");
+            txtLog2.Text = p.StandardOutput.ReadToEnd();
+            p.Close();
+
+            p.StartInfo.Arguments = "shell echo '2' | qseecom_sample_client v smplap32 14 1";
+            p.Start();
+            p.StandardInput.WriteLine("adb shell echo '2' | qseecom_sample_client v smplap32 14 1");
+            txtLog2.Text += p.StandardOutput.ReadToEnd();
+            p.Close();
+
+            txtLog2.SelectionStart = txtLog2.TextLength;
+            txtLog2.ScrollToCaret();
+
+            Regex rgx = new Regex("RPMB_KEY_PROVISIONED_AND_OK");
+            if (rgx.Matches(txtLog2.Text).Count == 1)
+               MessageBox.Show("權限已開啟, 可進行後續燒金鑰步驟");
+        }
+
+        private void btnKeyBurn_Click(object sender, EventArgs e)
+        {
+            key = "6e81d3a6-61d4-46d2-bed4-77d43e2a2eb4";
+            string keyboxPath = "D:/ossa_cert/kb/kb007/keybox_output/keybox_6e81d3a6-61d4-46d2-bed4-77d43e2a2eb4.xml";
+            if (!File.Exists(keyboxPath))
+            {
+                MessageBox.Show(keyboxPath + "\n 檔案不存在");
+                return;
+            }
+
+            string keyboxName = Path.GetFileName(keyboxPath);
+            if (!keyboxPath.Contains(key))
+            {
+                MessageBox.Show(key + " 與 keybox 不匹配");
+                return;
+            }
+
+            p.StartInfo.Arguments = "shell getprop ro.product.board";
+            p.Start();
+            p.StandardInput.WriteLine("adb shell getprop ro.product.board");
+            string deviceType = p.StandardOutput.ReadToEnd().Replace("\n", "").Replace("\r", "");
+            p.Close();
+            if (!deviceType.Equals("qcs605") && !deviceType.Equals("qcs603"))
+            {
+                MessageBox.Show("目前不支援 " + deviceType + "裝置種類, 請聯繫客服!");
+                return;
+            }
+
+            p.StartInfo.Arguments = "root";
+            p.Start();
+            p.StandardInput.WriteLine("adb root");
+            p.Close();
+
+            string arg = "push " + keyboxPath + " /data";
+            p.StartInfo.Arguments = arg;
+            p.Start();
+            p.StandardInput.WriteLine("adb " + arg);
+            txtLog2.Text = p.StandardOutput.ReadToEnd();
+            p.Close();
+
+            p.StartInfo.Arguments = "root";
+            p.Start();
+            p.StandardInput.WriteLine("adb root");
+            p.Close();
+
+            //string arg2 = "shell LD_LIBRARY_PATH =/vendor/lib64/hw KmInstallKeybox /data/" + keyboxName + " " + key + " true";
+            //p.StartInfo.Arguments = "shell LD_LIBRARY_PATH =/vendor/lib64/hw KmInstallKeybox /data/keybox_6e81d3a6-61d4-46d2-bed4-77d43e2a2eb4.xml keybox_6e81d3a6-61d4-46d2-bed4-77d43e2a2eb4 true";
+            //p.Start();
+            //p.StandardInput.WriteLine("adb shell LD_LIBRARY_PATH =/vendor/lib64/hw KmInstallKeybox /data/keybox_6e81d3a6-61d4-46d2-bed4-77d43e2a2eb4.xml keybox_6e81d3a6-61d4-46d2-bed4-77d43e2a2eb4 true");
+            //while (!p.StandardOutput.EndOfStream)
+            //{
+            //    txtLog2.Text += Environment.NewLine + p.StandardOutput.ReadLine();
+            //}
+            //txtLog2.Text += Environment.NewLine + arg2;
+            //p.Close();
+
+            //p.StartInfo.Arguments = "reboot";
+            //p.Start();
+            //p.StandardInput.WriteLine("adb reboot");
+            //p.Close();
+        }
+
+        private void btnChangeStorage_Click(object sender, EventArgs e)
+        {
+            DialogResult result = storageDirDialog.ShowDialog();
+            if(result == DialogResult.OK)
+            {
+                txtStoragePath.Text = storageDirDialog.SelectedPath;
+                Properties.Settings.Default.FileStoragePath = storageDirDialog.SelectedPath;
+                Properties.Settings.Default.Save();
             }
         }
     }

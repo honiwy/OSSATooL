@@ -43,6 +43,10 @@ namespace ossaTool
             this.btn1ConnectCheck = new System.Windows.Forms.Button();
             this.txt1ConnectionStatus = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btnChangeStorage = new System.Windows.Forms.Button();
+            this.txtStoragePath = new System.Windows.Forms.TextBox();
+            this.btnKeyBurn = new System.Windows.Forms.Button();
+            this.btnChangePermission = new System.Windows.Forms.Button();
             this.btnUpdateCSV = new System.Windows.Forms.Button();
             this.btnUpdateTXT = new System.Windows.Forms.Button();
             this.lblDHCP = new System.Windows.Forms.Label();
@@ -53,6 +57,7 @@ namespace ossaTool
             this.bgWorkerConnection = new System.ComponentModel.BackgroundWorker();
             this.bgWorkerQFIL = new System.ComponentModel.BackgroundWorker();
             this.bgWorkerEdl = new System.ComponentModel.BackgroundWorker();
+            this.storageDirDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.tabControlMenu.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -193,6 +198,10 @@ namespace ossaTool
             // tabPage2
             // 
             this.tabPage2.BackColor = System.Drawing.Color.LightSlateGray;
+            this.tabPage2.Controls.Add(this.btnChangeStorage);
+            this.tabPage2.Controls.Add(this.txtStoragePath);
+            this.tabPage2.Controls.Add(this.btnKeyBurn);
+            this.tabPage2.Controls.Add(this.btnChangePermission);
             this.tabPage2.Controls.Add(this.btnUpdateCSV);
             this.tabPage2.Controls.Add(this.btnUpdateTXT);
             this.tabPage2.Controls.Add(this.lblDHCP);
@@ -209,12 +218,57 @@ namespace ossaTool
             this.tabPage2.Enter += new System.EventHandler(this.tabPage2_Enter);
             this.tabPage2.Leave += new System.EventHandler(this.tabPage2_Leave);
             // 
+            // btnChangeStorage
+            // 
+            this.btnChangeStorage.BackColor = System.Drawing.Color.DarkSeaGreen;
+            this.btnChangeStorage.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnChangeStorage.Location = new System.Drawing.Point(434, 318);
+            this.btnChangeStorage.Name = "btnChangeStorage";
+            this.btnChangeStorage.Size = new System.Drawing.Size(111, 23);
+            this.btnChangeStorage.TabIndex = 10;
+            this.btnChangeStorage.Text = "變更儲存資料夾";
+            this.btnChangeStorage.UseVisualStyleBackColor = false;
+            this.btnChangeStorage.Click += new System.EventHandler(this.btnChangeStorage_Click);
+            // 
+            // txtStoragePath
+            // 
+            this.txtStoragePath.Location = new System.Drawing.Point(61, 318);
+            this.txtStoragePath.Name = "txtStoragePath";
+            this.txtStoragePath.ReadOnly = true;
+            this.txtStoragePath.Size = new System.Drawing.Size(367, 23);
+            this.txtStoragePath.TabIndex = 9;
+            // 
+            // btnKeyBurn
+            // 
+            this.btnKeyBurn.BackColor = System.Drawing.Color.LightGoldenrodYellow;
+            this.btnKeyBurn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnKeyBurn.Location = new System.Drawing.Point(61, 213);
+            this.btnKeyBurn.Name = "btnKeyBurn";
+            this.btnKeyBurn.Size = new System.Drawing.Size(107, 23);
+            this.btnKeyBurn.TabIndex = 8;
+            this.btnKeyBurn.Text = "燒錄金鑰";
+            this.btnKeyBurn.UseVisualStyleBackColor = false;
+            this.btnKeyBurn.Click += new System.EventHandler(this.btnKeyBurn_Click);
+            // 
+            // btnChangePermission
+            // 
+            this.btnChangePermission.BackColor = System.Drawing.Color.Tan;
+            this.btnChangePermission.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnChangePermission.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btnChangePermission.Location = new System.Drawing.Point(61, 142);
+            this.btnChangePermission.Name = "btnChangePermission";
+            this.btnChangePermission.Size = new System.Drawing.Size(107, 23);
+            this.btnChangePermission.TabIndex = 7;
+            this.btnChangePermission.Text = "開啟金鑰權限";
+            this.btnChangePermission.UseVisualStyleBackColor = false;
+            this.btnChangePermission.Click += new System.EventHandler(this.btnChangePermission_Click);
+            // 
             // btnUpdateCSV
             // 
             this.btnUpdateCSV.BackColor = System.Drawing.Color.LightSteelBlue;
             this.btnUpdateCSV.Enabled = false;
             this.btnUpdateCSV.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnUpdateCSV.Location = new System.Drawing.Point(61, 214);
+            this.btnUpdateCSV.Location = new System.Drawing.Point(551, 318);
             this.btnUpdateCSV.Name = "btnUpdateCSV";
             this.btnUpdateCSV.Size = new System.Drawing.Size(107, 23);
             this.btnUpdateCSV.TabIndex = 6;
@@ -224,10 +278,10 @@ namespace ossaTool
             // 
             // btnUpdateTXT
             // 
-            this.btnUpdateTXT.BackColor = System.Drawing.Color.Tan;
+            this.btnUpdateTXT.BackColor = System.Drawing.Color.LightSteelBlue;
             this.btnUpdateTXT.Enabled = false;
             this.btnUpdateTXT.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnUpdateTXT.Location = new System.Drawing.Point(61, 163);
+            this.btnUpdateTXT.Location = new System.Drawing.Point(664, 318);
             this.btnUpdateTXT.Name = "btnUpdateTXT";
             this.btnUpdateTXT.Size = new System.Drawing.Size(107, 23);
             this.btnUpdateTXT.TabIndex = 5;
@@ -246,10 +300,11 @@ namespace ossaTool
             // 
             // txtLog2
             // 
-            this.txtLog2.Location = new System.Drawing.Point(218, 79);
+            this.txtLog2.Location = new System.Drawing.Point(186, 79);
             this.txtLog2.Multiline = true;
             this.txtLog2.Name = "txtLog2";
-            this.txtLog2.Size = new System.Drawing.Size(409, 64);
+            this.txtLog2.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtLog2.Size = new System.Drawing.Size(585, 157);
             this.txtLog2.TabIndex = 3;
             // 
             // btnGetIP
@@ -269,16 +324,16 @@ namespace ossaTool
             this.lblPluginHint.AutoSize = true;
             this.lblPluginHint.Location = new System.Drawing.Point(298, 42);
             this.lblPluginHint.Name = "lblPluginHint";
-            this.lblPluginHint.Size = new System.Drawing.Size(329, 15);
+            this.lblPluginHint.Size = new System.Drawing.Size(339, 15);
             this.lblPluginHint.TabIndex = 1;
-            this.lblPluginHint.Text = "計時器停止後, 請插回 USB 線並點選下方按鈕取得 IP 位置";
+            this.lblPluginHint.Text = "計時器停止後, 請插回 USB 線並點選下方按鈕取得裝置資訊";
             // 
             // txtCountDown
             // 
-            this.txtCountDown.Location = new System.Drawing.Point(218, 39);
+            this.txtCountDown.Location = new System.Drawing.Point(227, 39);
             this.txtCountDown.Name = "txtCountDown";
             this.txtCountDown.ReadOnly = true;
-            this.txtCountDown.Size = new System.Drawing.Size(74, 23);
+            this.txtCountDown.Size = new System.Drawing.Size(65, 23);
             this.txtCountDown.TabIndex = 0;
             // 
             // bgWorkerConnection
@@ -346,6 +401,11 @@ namespace ossaTool
         private System.Windows.Forms.Label lblPluginHint;
         private System.Windows.Forms.TextBox txtCountDown;
         private System.Windows.Forms.Button btnUpdateCSV;
+        private System.Windows.Forms.Button btnChangePermission;
+        private System.Windows.Forms.Button btnKeyBurn;
+        private System.Windows.Forms.Button btnChangeStorage;
+        private System.Windows.Forms.TextBox txtStoragePath;
+        private System.Windows.Forms.FolderBrowserDialog storageDirDialog;
     }
 }
 
