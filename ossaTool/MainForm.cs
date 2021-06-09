@@ -16,6 +16,7 @@ namespace ossaTool
         {
             InitializeComponent();
             txtStoragePath.Text = Properties.Settings.Default.FileStoragePath;
+            txtQFILPath.Text = Properties.Settings.Default.QFILFilePath;
             p = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -32,8 +33,7 @@ namespace ossaTool
 
         //@"D:\OSSA_new\ossaTool\adb\adb.exe";
         private string adbPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\adb\\adb.exe");
-        //@"D:\OSSA_new\ossaTool\flash_images_and_validate.bat";
-        private string qfilPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\flash_images_and_validate.bat");
+        private string qfilLogPath = @"C:\QFIL\log\flat_log.txt";
 
         private string error = "失敗 :(";
         private string success = "成功 :)";
@@ -57,9 +57,10 @@ namespace ossaTool
         private string device_sn = "";
         private string mac_address = "";
         private string key = "";
-        private Process p;
+        private readonly Process p;
 
-        private void button1_Click(object sender, EventArgs e)
+        #region tabpage 1
+        private void btn1Connect_Click(object sender, EventArgs e)
         {
             txt1ConnectionStatus.Text = connecting;
             btn1ConnectCheck.Enabled = false;
@@ -171,41 +172,43 @@ namespace ossaTool
 
         private void btnQFIL_Click(object sender, EventArgs e)
         {
+            if(!File.Exists(Properties.Settings.Default.QFILFilePath))
+            {
+                MessageBox.Show("燒機檔案不存在, 請重新確認");
+                return;
+            }
+            if(new FileInfo(Properties.Settings.Default.QFILFilePath).Extension != ".elf")
+            {
+                MessageBox.Show("燒機檔案格式不正確, 請重新確認");
+                return;
+            }
             txt1QFILStatus.Text = qfiling;
             btnQFIL.Enabled = false;
             bgWorkerQFIL.RunWorkerAsync();
         }
-
+       
         private void qFILProcess(DoWorkEventArgs e)
         {
-            Process pbat = new Process() { 
+            string argument = "-Mode=3 -downloadflat -COM=7  -Programmer=true;\"" + Properties.Settings.Default.QFILFilePath + "\" -deviceType=\"emmc\" - VALIDATIONMODE=2 " +
+                "-SWITCHTOFIREHOSETIMEOUT=50 -RESETTIMEOUT=500 -RESETDELAYTIME=5 -RESETAFTERDOWNLOAD=true -MaxPayloadSizeToTargetInBytes=true;49152 -searchpath=\"" + 
+                Path.GetDirectoryName(Properties.Settings.Default.QFILFilePath) + "\" -Rawprogram=\"rawprogram_unsparse.xml\" -Patch=\"patch0.xml\" -logfilepath=\"" + qfilLogPath + "\"";
+
+            Process pbat = new Process()
+            {
                 StartInfo = new ProcessStartInfo()
                 {
                     UseShellExecute = false,
                     CreateNoWindow = true,
-                    FileName = qfilPath,
+                    FileName = @"C:\Program Files (x86)\Qualcomm\QPST\bin\qfil.exe",
+                    Arguments = argument,
                     RedirectStandardError = true,
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
                 }
             };
-            //Fixme : should let user select qfil folder
-            //p.StartInfo.ArgumentList.Add("-Mode=3");
-            //p.StartInfo.ArgumentList.Add("-downloadflat");
-            //p.StartInfo.ArgumentList.Add("-COM=7");
-            //p.StartInfo.ArgumentList.Add("-Programmer=true;\"\"\"C:\\Users\\avc\\Desktop\\Cabello_SR2_2021_05_06_66_release_Flat\\emmc\\prog_firehose_ddr.elf\"\"\"");
-            //p.StartInfo.ArgumentList.Add("-deviceType=\"\"\"emmc\"\"\"");
-            //p.StartInfo.ArgumentList.Add("-VALIDATIONMODE=2");
-            //p.StartInfo.ArgumentList.Add("-SWITCHTOFIREHOSETIMEOUT=50");
-            //p.StartInfo.ArgumentList.Add("-RESETTIMEOUT=500");
-            //p.StartInfo.ArgumentList.Add("-RESETDELAYTIME=5");
-            //p.StartInfo.ArgumentList.Add("-RESETAFTERDOWNLOAD=true");
-            //p.StartInfo.ArgumentList.Add("-MaxPayloadSizeToTargetInBytes=true;49152");
-            //p.StartInfo.ArgumentList.Add("-searchpath=\"\"\"C:\\Users\\avc\\Desktop\\Cabello_SR2_2021_05_06_66_release_Flat\\emmc\"\"\"");
-            //p.StartInfo.ArgumentList.Add("-Rawprogram=\"\"\"rawprogram_unsparse.xml\"\"\"");
-            //p.StartInfo.ArgumentList.Add("-Patch=\"\"\"patch0.xml\"\"\"");
-            //p.StartInfo.ArgumentList.Add("-logfilepath=\"\"\"C:\\QFIL\\log\\flat_log.txt\"\"\"");
+
             pbat.Start();
+            pbat.StandardInput.WriteLine("qfil " + argument);
             pbat.Close();
             for (int j = 0; j < 100; j++)
             {
@@ -217,7 +220,7 @@ namespace ossaTool
                     e.Cancel = true;
                     break;
                 }
-                    
+
             }
         }
 
@@ -230,12 +233,11 @@ namespace ossaTool
         {
             pgBarQFIL.Value = e.ProgressPercentage;
 
-            Regex rgx = new Regex("Finish Download");
-            String log = File.ReadAllText("C:\\QFIL\\log\\flat_log.txt");
+            String log = File.ReadAllText(qfilLogPath);
             txtLog.Text = log;
             txtLog.SelectionStart = txtLog.TextLength;
             txtLog.ScrollToCaret();
-            if (rgx.Matches(log).Count == 1)
+            if (new Regex("Finish Download").Matches(log).Count == 1 && new Regex("Download Succeed").Matches(log).Count == 1)
                 qfilSuccessful = true;
         }
 
@@ -254,20 +256,23 @@ namespace ossaTool
             }
         }
 
-        private void adbCommand()
+        private void btnQFILPath_Click(object sender, EventArgs e)
         {
-            Process p = new Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.CreateNoWindow = false;
-            p.StartInfo.FileName = "cmd.exe";
-            p.StartInfo.Arguments = "/c adb connect 172.16.116.34";
-            p.StartInfo.RedirectStandardError = true;
-            p.StartInfo.RedirectStandardInput = true;
-            p.StartInfo.RedirectStandardOutput = true;
-
-            p.Start();
+            qfilFileDialog.Title = "Select file";
+            qfilFileDialog.InitialDirectory = ".\\";
+            qfilFileDialog.Filter = "elf files (*.*)|*.elf";
+            if (qfilFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                txtQFILPath.Text = qfilFileDialog.FileName;
+                txtQFILPath.SelectionStart = txtQFILPath.Text.Length;
+                txtQFILPath.SelectionLength = 0;
+                Properties.Settings.Default.QFILFilePath = qfilFileDialog.FileName;
+                Properties.Settings.Default.Save();
+            }
         }
+        #endregion
 
+        #region tabpage 2
         private void tabPage2_Enter(object sender, EventArgs e)
         {
             timer.SetTime(0, 50);
@@ -320,7 +325,7 @@ namespace ossaTool
 
         private void btnWriteFile_Click(object sender, EventArgs e)
         {
-            string path = Properties.Settings.Default.FileStoragePath + "/deviceInfoLog.txt";
+            string path = $"{Properties.Settings.Default.FileStoragePath}/deviceInfoLog.txt";
             using (StreamWriter sw = new StreamWriter(path, true))   
             {
                 if (sw.BaseStream.Position == 0)
@@ -335,7 +340,7 @@ namespace ossaTool
 
         private void btnUpdateCSV_Click(object sender, EventArgs e)
         {
-            string path = Properties.Settings.Default.FileStoragePath + "/deviceInfoLog.csv";
+            string path = $"{Properties.Settings.Default.FileStoragePath}/deviceInfoLog.csv";
             using (StreamWriter sw = new StreamWriter(new FileStream(path, FileMode.Append, FileAccess.Write)))
             {
                 if (sw.BaseStream.Position == 0)
@@ -354,6 +359,8 @@ namespace ossaTool
             p.StandardInput.WriteLine("adb root");
             p.Close();
 
+            Thread.Sleep(2000);
+
             p.StartInfo.Arguments = "shell echo '1' | qseecom_sample_client v smplap32 14 1";
             p.Start();
             p.StandardInput.WriteLine("adb shell echo '1' | qseecom_sample_client v smplap32 14 1");
@@ -369,8 +376,7 @@ namespace ossaTool
             txtLog2.SelectionStart = txtLog2.TextLength;
             txtLog2.ScrollToCaret();
 
-            Regex rgx = new Regex("RPMB_KEY_PROVISIONED_AND_OK");
-            if (rgx.Matches(txtLog2.Text).Count == 1)
+            if (new Regex("RPMB_KEY_PROVISIONED_AND_OK").Matches(txtLog2.Text).Count == 1)
                MessageBox.Show("權限已開啟, 可進行後續燒金鑰步驟");
         }
 
@@ -446,5 +452,6 @@ namespace ossaTool
                 Properties.Settings.Default.Save();
             }
         }
+        #endregion
     }
 }

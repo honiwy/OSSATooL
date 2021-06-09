@@ -25,13 +25,25 @@ namespace ossaTool.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("D:\\OSSA_new\\ossaTool\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("D:\\ossaTool\\")]
         public string FileStoragePath {
             get {
                 return ((string)(this["FileStoragePath"]));
             }
             set {
                 this["FileStoragePath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string QFILFilePath {
+            get {
+                return ((string)(this["QFILFilePath"]));
+            }
+            set {
+                this["QFILFilePath"] = value;
             }
         }
     }

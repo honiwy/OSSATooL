@@ -3,7 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="FileStoragePath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">D:\OSSA_new\ossaTool\</Value>
+      <Value Profile="(Default)">D:\ossaTool\</Value>
+    </Setting>
+    <Setting Name="QFILFilePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

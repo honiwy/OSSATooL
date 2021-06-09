@@ -1,0 +1,5 @@
+*.[Cc]ache
+*.suo
+[Bb]in/
+[Oo]bj/
+.vs/
