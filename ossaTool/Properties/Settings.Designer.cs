@@ -25,7 +25,7 @@ namespace ossaTool.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("D:\\ossaTool\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string FileStoragePath {
             get {
                 return ((string)(this["FileStoragePath"]));
@@ -44,6 +44,18 @@ namespace ossaTool.Properties {
             }
             set {
                 this["QFILFilePath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string KeyRepoPath {
+            get {
+                return ((string)(this["KeyRepoPath"]));
+            }
+            set {
+                this["KeyRepoPath"] = value;
             }
         }
     }
