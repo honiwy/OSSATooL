@@ -36,7 +36,8 @@ namespace ossaTool
         }
 
         //@"D:\OSSA_new\ossaTool\adb\adb.exe";
-        private string _adbPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\adb\\adb.exe");
+        //private string _adbPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\adb\\adb.exe");
+        private string _adbPath = "adb.exe";
         private string _qfilPath = @"C:\Program Files (x86)\Qualcomm\QPST\bin\qfil.exe";
         private string _qfilLogPath = $"{Properties.Settings.Default.FileStoragePath}/flat_log.txt";
 
@@ -70,7 +71,7 @@ namespace ossaTool
 
         private void bgWorkerConnection_DoWork(object sender, DoWorkEventArgs e)
         {
-            ConnectionProcess(e,false);
+            ConnectionProcess(e, false);
         }
 
         private void ConnectionProcess(DoWorkEventArgs e, bool edlProcess)
@@ -91,7 +92,7 @@ namespace ossaTool
                     break;
 
                 }
-                else if( rgx.Matches(_processLog).Count > 1 && !edlProcess)
+                else if (rgx.Matches(_processLog).Count > 1 && !edlProcess)
                 {
                     bgWorkerConnection.ReportProgress(100);
                     _connectionStatus = true;
@@ -137,14 +138,14 @@ namespace ossaTool
             _rebootEdlStatus = false;
             _p.StartInfo.Arguments = "reboot edl";
             _p.Start();
-            _p.StandardInput.WriteLine("adb "+ _p.StartInfo.Arguments);
+            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
             _p.Close();
             bgWorkerEdl.RunWorkerAsync();
         }
 
         private void bgWorkerEdl_DoWork(object sender, DoWorkEventArgs e)
         {
-            ConnectionProcess(e,true);
+            ConnectionProcess(e, true);
         }
 
         private void bgWorkerEdl_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -186,12 +187,12 @@ namespace ossaTool
 
         private void btnQFIL_Click(object sender, EventArgs e)
         {
-            if(!File.Exists(Properties.Settings.Default.QFILFilePath))
+            if (!File.Exists(Properties.Settings.Default.QFILFilePath))
             {
                 MessageBox.Show("燒機檔案不存在, 請重新確認");
                 return;
             }
-            if(new FileInfo(Properties.Settings.Default.QFILFilePath).Extension != ".elf")
+            if (new FileInfo(Properties.Settings.Default.QFILFilePath).Extension != ".elf")
             {
                 MessageBox.Show("燒機檔案格式不正確, 請重新確認");
                 return;
@@ -200,11 +201,11 @@ namespace ossaTool
             btnQFIL.Enabled = false;
             bgWorkerQFIL.RunWorkerAsync();
         }
-       
+
         private void qFILProcess(DoWorkEventArgs e)
         {
             string argument = "-Mode=3 -downloadflat -COM=7  -Programmer=true;\"" + Properties.Settings.Default.QFILFilePath + "\" -deviceType=\"emmc\" - VALIDATIONMODE=2 " +
-                "-SWITCHTOFIREHOSETIMEOUT=50 -RESETTIMEOUT=500 -RESETDELAYTIME=5 -RESETAFTERDOWNLOAD=true -MaxPayloadSizeToTargetInBytes=true;49152 -searchpath=\"" + 
+                "-SWITCHTOFIREHOSETIMEOUT=50 -RESETTIMEOUT=500 -RESETDELAYTIME=5 -RESETAFTERDOWNLOAD=true -MaxPayloadSizeToTargetInBytes=true;49152 -searchpath=\"" +
                 Path.GetDirectoryName(Properties.Settings.Default.QFILFilePath) + "\" -Rawprogram=\"rawprogram_unsparse.xml\" -Patch=\"patch0.xml\" -logfilepath=\"" + _qfilLogPath + "\"";
 
             Process pbat = new Process()
@@ -246,8 +247,8 @@ namespace ossaTool
         private void bgWorkerQFIL_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             pgBarQFIL.Value = e.ProgressPercentage;
-
-            _processLog = File.ReadAllText(_qfilLogPath);
+            using (var stream = File.Open(_qfilLogPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                _processLog = File.ReadAllText(_qfilLogPath);
             txtLog.Text = _processLog;
             txtLog.SelectionStart = txtLog.TextLength;
             txtLog.ScrollToCaret();
@@ -294,7 +295,7 @@ namespace ossaTool
                 #region get IP address
                 _p.StartInfo.Arguments = "logcat -d | findstr LinkAddresses";
                 _p.Start();
-                _p.StandardInput.WriteLine("adb "+ _p.StartInfo.Arguments);
+                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
                 _processLog = _p.StandardOutput.ReadToEnd();
                 _p.Close();
                 MatchCollection matchCollection = new Regex(@"LinkAddresses.+?(?=\])").Matches(_processLog);
@@ -304,7 +305,7 @@ namespace ossaTool
                 #region get device serial number
                 _p.StartInfo.Arguments = "shell cat /avc_info/device_sn";
                 _p.Start();
-                _p.StandardInput.WriteLine("adb "+ _p.StartInfo.Arguments);
+                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
                 _deviceSerialNumber = _p.StandardOutput.ReadToEnd().Replace("\n", "").Replace("\r", "");
                 _p.Close();
                 txtLog2.Text += Environment.NewLine + "Serial number: [" + _deviceSerialNumber + "]";
@@ -313,7 +314,7 @@ namespace ossaTool
                 #region get device mac address
                 _p.StartInfo.Arguments = "shell cat /avc_info/mac_address";
                 _p.Start();
-                _p.StandardInput.WriteLine("adb "+ _p.StartInfo.Arguments);
+                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
                 _macAddress = _p.StandardOutput.ReadToEnd().Replace("\n", "").Replace("\r", "");
                 _p.Close();
                 txtLog2.Text += Environment.NewLine + "MAC address: [" + _macAddress + "]";
@@ -323,28 +324,29 @@ namespace ossaTool
                 //{
                 btnUpdateCSV.Enabled = true;
                 btnUpdateTXT.Enabled = true;
+                btnRPMBInitialize.Enabled = true;
                 //}
             }
         }
 
-        private void btnChangePermission_Click(object sender, EventArgs e)
+        private void btnRPMBInitialize_Click(object sender, EventArgs e)
         {
             _p.StartInfo.Arguments = "root";
             _p.Start();
-            _p.StandardInput.WriteLine("adb root");
+            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
             _p.Close();
 
             Thread.Sleep(2000);
 
             _p.StartInfo.Arguments = "shell echo '1' | qseecom_sample_client v smplap32 14 1";
             _p.Start();
-            _p.StandardInput.WriteLine("adb shell echo '1' | qseecom_sample_client v smplap32 14 1");
+            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
             txtLog2.Text = _p.StandardOutput.ReadToEnd();
             _p.Close();
 
             _p.StartInfo.Arguments = "shell echo '2' | qseecom_sample_client v smplap32 14 1";
             _p.Start();
-            _p.StandardInput.WriteLine("adb shell echo '2' | qseecom_sample_client v smplap32 14 1");
+            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
             txtLog2.Text += _p.StandardOutput.ReadToEnd();
             _p.Close();
 
@@ -352,7 +354,13 @@ namespace ossaTool
             txtLog2.ScrollToCaret();
 
             if (new Regex("RPMB_KEY_PROVISIONED_AND_OK").Matches(txtLog2.Text).Count == 1)
-               MessageBox.Show("權限已開啟, 可進行後續燒金鑰步驟");
+            {
+                _p.StartInfo.Arguments = "reboot";
+                _p.Start();
+                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
+                _p.Close();
+                MessageBox.Show("RPMB 初始化完成, 待裝置重開機後可繼續燒金鑰步驟");
+            }
         }
 
         private void btnChangeKeyRepo_Click(object sender, EventArgs e)
@@ -411,7 +419,7 @@ namespace ossaTool
 
             _p.StartInfo.Arguments = "shell getprop ro.product.board";
             _p.Start();
-            _p.StandardInput.WriteLine("adb shell getprop ro.product.board");
+            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
             string deviceType = _p.StandardOutput.ReadToEnd().Replace("\n", "").Replace("\r", "");
             _p.Close();
             if (!deviceType.Equals("qcs605") && !deviceType.Equals("qcs603"))
@@ -422,7 +430,7 @@ namespace ossaTool
 
             _p.StartInfo.Arguments = "root";
             _p.Start();
-            _p.StandardInput.WriteLine("adb "+ _p.StartInfo.Arguments);
+            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
             _p.Close();
 
             _p.StartInfo.Arguments = "push " + _keyboxPath + " /data";
@@ -431,29 +439,21 @@ namespace ossaTool
             txtLog2.Text = _p.StandardOutput.ReadToEnd();
             _p.Close();
 
-            _p.StartInfo.Arguments = "root";
-            _p.Start();
-            _p.StandardInput.WriteLine("adb root");
-            _p.Close();
 
-            Process pbat = new Process()
+            if (MessageBox.Show("請開啟命令提示字元並於 Ctrl + V 執行以完成燒機步驟") == DialogResult.OK)
             {
-                StartInfo = new ProcessStartInfo()
-                {
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    FileName = @"D:\OSSA_new\ossaTool\provision.bat",
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
-                }
-            };
+                string logPath = new DirectoryInfo(Properties.Settings.Default.FileStoragePath + String.Format("/provisioning_log_{0}.txt", _key)).FullName.Replace(@"\", "/");
+                string command = String.Format("adb shell \"LD_LIBRARY_PATH=/vendor/lib64/hw KmInstallKeybox /data/{0} {1} true\" > {2}", Path.GetFileName(_keyboxPath), _key, logPath);
 
-            pbat.Start();
-            txtLog2.Text += "HAHA";
-            pbat.WaitForExit(5000);
-            txtLog2.Text += "yoyo";
+                txtLog2.Text += Environment.NewLine + command;
+                Clipboard.SetText(command);
 
+                string folder = Path.GetDirectoryName(_keyboxPath) + @"\used\";
+                if (!Directory.Exists(folder))
+                    Directory.CreateDirectory(folder);
+
+                File.Move(_keyboxPath, folder + Path.GetFileName(_keyboxPath), true);
+            }
         }
 
         private void btnChangeStorage_Click(object sender, EventArgs e)
@@ -500,9 +500,9 @@ namespace ossaTool
 
         private void btnOpenStorageDir_Click(object sender, EventArgs e)
         {
-            if(Directory.Exists(Properties.Settings.Default.FileStoragePath))
-              Process.Start(Environment.GetEnvironmentVariable("WINDIR") + @"\explorer.exe",Properties.Settings.Default.FileStoragePath);
+            if (Directory.Exists(Properties.Settings.Default.FileStoragePath))
+                Process.Start(Environment.GetEnvironmentVariable("WINDIR") + @"\explorer.exe", Properties.Settings.Default.FileStoragePath);
         }
 
-    }
+    } }
 }

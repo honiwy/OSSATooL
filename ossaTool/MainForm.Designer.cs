@@ -51,7 +51,7 @@ namespace ossaTool
             this.txtKeyName = new System.Windows.Forms.TextBox();
             this.txtKeyboxPath = new System.Windows.Forms.TextBox();
             this.btnKeyBurn = new System.Windows.Forms.Button();
-            this.btnChangePermission = new System.Windows.Forms.Button();
+            this.btnRPMBInitialize = new System.Windows.Forms.Button();
             this.lblDHCP = new System.Windows.Forms.Label();
             this.txtLog2 = new System.Windows.Forms.TextBox();
             this.btnGetIP = new System.Windows.Forms.Button();
@@ -244,7 +244,7 @@ namespace ossaTool
             this.tabPage2.Controls.Add(this.txtKeyName);
             this.tabPage2.Controls.Add(this.txtKeyboxPath);
             this.tabPage2.Controls.Add(this.btnKeyBurn);
-            this.tabPage2.Controls.Add(this.btnChangePermission);
+            this.tabPage2.Controls.Add(this.btnRPMBInitialize);
             this.tabPage2.Controls.Add(this.lblDHCP);
             this.tabPage2.Controls.Add(this.txtLog2);
             this.tabPage2.Controls.Add(this.btnGetIP);
@@ -318,18 +318,19 @@ namespace ossaTool
             this.btnKeyBurn.UseVisualStyleBackColor = false;
             this.btnKeyBurn.Click += new System.EventHandler(this.btnKeyBurn_Click);
             // 
-            // btnChangePermission
+            // btnRPMBInitialize
             // 
-            this.btnChangePermission.BackColor = System.Drawing.Color.Tan;
-            this.btnChangePermission.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnChangePermission.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btnChangePermission.Location = new System.Drawing.Point(20, 220);
-            this.btnChangePermission.Name = "btnChangePermission";
-            this.btnChangePermission.Size = new System.Drawing.Size(107, 23);
-            this.btnChangePermission.TabIndex = 7;
-            this.btnChangePermission.Text = "開啟金鑰權限";
-            this.btnChangePermission.UseVisualStyleBackColor = false;
-            this.btnChangePermission.Click += new System.EventHandler(this.btnChangePermission_Click);
+            this.btnRPMBInitialize.BackColor = System.Drawing.Color.Tan;
+            this.btnRPMBInitialize.Enabled = false;
+            this.btnRPMBInitialize.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnRPMBInitialize.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btnRPMBInitialize.Location = new System.Drawing.Point(20, 220);
+            this.btnRPMBInitialize.Name = "btnRPMBInitialize";
+            this.btnRPMBInitialize.Size = new System.Drawing.Size(107, 23);
+            this.btnRPMBInitialize.TabIndex = 7;
+            this.btnRPMBInitialize.Text = "RPMB 初始化";
+            this.btnRPMBInitialize.UseVisualStyleBackColor = false;
+            this.btnRPMBInitialize.Click += new System.EventHandler(this.btnRPMBInitialize_Click);
             // 
             // lblDHCP
             // 
@@ -537,7 +538,7 @@ namespace ossaTool
         private System.Windows.Forms.Label lblPluginHint;
         private System.Windows.Forms.TextBox txtCountDown;
         private System.Windows.Forms.Button btnUpdateCSV;
-        private System.Windows.Forms.Button btnChangePermission;
+        private System.Windows.Forms.Button btnRPMBInitialize;
         private System.Windows.Forms.Button btnKeyBurn;
         private System.Windows.Forms.Button btnChangeStorage;
         private System.Windows.Forms.TextBox txtStoragePath;
