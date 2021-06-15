@@ -1,6 +1,6 @@
 ossaTool/*.[Cc]ache
 ossaTool/*.suo
-ossaTool/[Bb]in/
-ossaTool/[Oo]bj/
+ossaTool/bin/
+ossaTool/obj/
 ossaTool/.vs/
 .vs/

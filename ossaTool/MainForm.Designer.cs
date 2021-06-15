@@ -467,6 +467,7 @@ namespace ossaTool
             this.toggleTXT.TabIndex = 15;
             this.toggleTXT.Text = "TXT";
             this.toggleTXT.TextEnabled = true;
+            this.toggleTXT.Click += new System.EventHandler(this.toggleTXT_Click);
             // 
             // label2
             // 

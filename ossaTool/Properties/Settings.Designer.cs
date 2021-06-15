@@ -58,5 +58,17 @@ namespace ossaTool.Properties {
                 this["KeyRepoPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool BoolSaveTxt {
+            get {
+                return ((bool)(this["BoolSaveTxt"]));
+            }
+            set {
+                this["BoolSaveTxt"] = value;
+            }
+        }
     }
 }

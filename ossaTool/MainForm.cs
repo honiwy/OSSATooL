@@ -5,8 +5,6 @@ using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.IO;
-using Microsoft.Office.Interop.Excel;
-using Application = System.Windows.Forms.Application;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -20,6 +18,7 @@ namespace ossaTool
             txtStoragePath.Text = Properties.Settings.Default.FileStoragePath;
             txtQFILPath.Text = Properties.Settings.Default.QFILFilePath;
             txtKeyRepoPath.Text = Properties.Settings.Default.KeyRepoPath;
+            toggleTXT.IsOn = Properties.Settings.Default.BoolSaveTxt;
             CheckKey();
             _p = new Process
             {
@@ -35,8 +34,6 @@ namespace ossaTool
             };
         }
 
-        //@"D:\OSSA_new\ossaTool\adb\adb.exe";
-        //private string _adbPath = Path.Combine(Path.GetPathRoot(Application.StartupPath), "OSSA_new\\ossaTool\\adb\\adb.exe");
         private string _adbPath = "adb.exe";
         private string _qfilPath = @"C:\Program Files (x86)\Qualcomm\QPST\bin\qfil.exe";
         private string _qfilLogPath = $"{Properties.Settings.Default.FileStoragePath}/flat_log.txt";
@@ -204,7 +201,7 @@ namespace ossaTool
             bgWorkerQFIL.RunWorkerAsync();
         }
 
-        private void qFILProcess(DoWorkEventArgs e)
+        private void QFILProcess(DoWorkEventArgs e)
         {
             string argument = "-Mode=3 -downloadflat -COM=7  -Programmer=true;\"" + Properties.Settings.Default.QFILFilePath + "\" -deviceType=\"emmc\" - VALIDATIONMODE=2 " +
                 "-SWITCHTOFIREHOSETIMEOUT=50 -RESETTIMEOUT=500 -RESETDELAYTIME=5 -RESETAFTERDOWNLOAD=true -MaxPayloadSizeToTargetInBytes=true;49152 -searchpath=\"" +
@@ -243,7 +240,7 @@ namespace ossaTool
 
         private void bgWorkerQFIL_DoWork(object sender, DoWorkEventArgs e)
         {
-            qFILProcess(e);
+            QFILProcess(e);
         }
 
         private void bgWorkerQFIL_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -388,28 +385,31 @@ namespace ossaTool
         {
             txtKeyboxPath.Text = Path.GetFileName(Properties.Settings.Default.KeyRepoPath);
             txtKeyName.Text = "無可使用之金鑰";
-            string[] subKeyboxDirs = Directory.GetDirectories(Properties.Settings.Default.KeyRepoPath);
-            _keyExisted = false;
-            foreach (string keybox in subKeyboxDirs)
+            if (Directory.Exists(Properties.Settings.Default.KeyRepoPath))
             {
-                string findPath = keybox + @"\keybox_output";
-                if (!Directory.Exists(findPath))
-                    continue;
-
-                IEnumerable<string> files = Directory.GetFiles(findPath, "*.xml", SearchOption.TopDirectoryOnly);
-                Debug.WriteLine("files.Count() " + files.Count());
-                if (files.Count() > 0)
+                string[] subKeyboxDirs = Directory.GetDirectories(Properties.Settings.Default.KeyRepoPath);
+                _keyExisted = false;
+                foreach (string keybox in subKeyboxDirs)
                 {
-                    txtKeyboxPath.Text = Path.GetFileName(keybox);
-                    string keyFile = Path.GetFileName(files.First());
-                    _keyboxPath = files.First();
-                    _key = keyFile.Substring(keyFile.IndexOf("_") + 1, 36);
-                    txtKeyName.Text = _key;
-                    _keyExisted = true;
-                    break;
+                    string findPath = keybox + @"\keybox_output";
+                    if (!Directory.Exists(findPath))
+                        continue;
+
+                    IEnumerable<string> files = Directory.GetFiles(findPath, "*.xml", SearchOption.TopDirectoryOnly);
+                    Debug.WriteLine("files.Count() " + files.Count());
+                    if (files.Count() > 0)
+                    {
+                        txtKeyboxPath.Text = Path.GetFileName(keybox);
+                        string keyFile = Path.GetFileName(files.First());
+                        _keyboxPath = files.First();
+                        _key = keyFile.Substring(keyFile.IndexOf("_") + 1, 36);
+                        txtKeyName.Text = _key;
+                        _keyExisted = true;
+                        break;
+                    }
                 }
+                CheckKeyBurnEnabled();
             }
-            CheckKeyBurnEnabled();
         }
 
         private void CheckKeyBurnEnabled()
@@ -512,5 +512,10 @@ namespace ossaTool
                 Process.Start(Environment.GetEnvironmentVariable("WINDIR") + @"\explorer.exe", Properties.Settings.Default.FileStoragePath);
         }
 
+        private void toggleTXT_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.BoolSaveTxt = toggleTXT.IsOn;
+            Properties.Settings.Default.Save();
+        }
     } 
 }
