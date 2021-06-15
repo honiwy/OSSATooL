@@ -59,8 +59,6 @@ namespace ossaTool
             this.txtCountDown = new System.Windows.Forms.TextBox();
             this.btnChangeStorage = new System.Windows.Forms.Button();
             this.txtStoragePath = new System.Windows.Forms.TextBox();
-            this.btnUpdateCSV = new System.Windows.Forms.Button();
-            this.btnUpdateTXT = new System.Windows.Forms.Button();
             this.bgWorkerConnection = new System.ComponentModel.BackgroundWorker();
             this.bgWorkerQFIL = new System.ComponentModel.BackgroundWorker();
             this.bgWorkerEdl = new System.ComponentModel.BackgroundWorker();
@@ -68,6 +66,8 @@ namespace ossaTool
             this.qfilFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.keyRepoDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.toggleTXT = new ossaTool.Toggle();
+            this.label2 = new System.Windows.Forms.Label();
             this.btnOpenStorageDir = new System.Windows.Forms.Button();
             this.tabControlMenu.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -397,34 +397,8 @@ namespace ossaTool
             this.txtStoragePath.Location = new System.Drawing.Point(140, 5);
             this.txtStoragePath.Name = "txtStoragePath";
             this.txtStoragePath.ReadOnly = true;
-            this.txtStoragePath.Size = new System.Drawing.Size(337, 23);
+            this.txtStoragePath.Size = new System.Drawing.Size(387, 23);
             this.txtStoragePath.TabIndex = 9;
-            // 
-            // btnUpdateCSV
-            // 
-            this.btnUpdateCSV.BackColor = System.Drawing.Color.LightSteelBlue;
-            this.btnUpdateCSV.Enabled = false;
-            this.btnUpdateCSV.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnUpdateCSV.Location = new System.Drawing.Point(550, 5);
-            this.btnUpdateCSV.Name = "btnUpdateCSV";
-            this.btnUpdateCSV.Size = new System.Drawing.Size(100, 23);
-            this.btnUpdateCSV.TabIndex = 6;
-            this.btnUpdateCSV.Text = "更新資訊(.csv)";
-            this.btnUpdateCSV.UseVisualStyleBackColor = false;
-            this.btnUpdateCSV.Click += new System.EventHandler(this.btnUpdateCSV_Click);
-            // 
-            // btnUpdateTXT
-            // 
-            this.btnUpdateTXT.BackColor = System.Drawing.Color.LightSteelBlue;
-            this.btnUpdateTXT.Enabled = false;
-            this.btnUpdateTXT.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnUpdateTXT.Location = new System.Drawing.Point(659, 5);
-            this.btnUpdateTXT.Name = "btnUpdateTXT";
-            this.btnUpdateTXT.Size = new System.Drawing.Size(100, 23);
-            this.btnUpdateTXT.TabIndex = 5;
-            this.btnUpdateTXT.Text = "更新資訊(.txt)";
-            this.btnUpdateTXT.UseVisualStyleBackColor = false;
-            this.btnUpdateTXT.Click += new System.EventHandler(this.btnUpdateTXT_Click);
             // 
             // bgWorkerConnection
             // 
@@ -467,25 +441,51 @@ namespace ossaTool
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.BackColor = System.Drawing.Color.LightSlateGray;
+            this.splitContainer1.Panel2.Controls.Add(this.toggleTXT);
+            this.splitContainer1.Panel2.Controls.Add(this.label2);
             this.splitContainer1.Panel2.Controls.Add(this.btnOpenStorageDir);
             this.splitContainer1.Panel2.Controls.Add(this.btnChangeStorage);
             this.splitContainer1.Panel2.Controls.Add(this.txtStoragePath);
-            this.splitContainer1.Panel2.Controls.Add(this.btnUpdateCSV);
-            this.splitContainer1.Panel2.Controls.Add(this.btnUpdateTXT);
             this.splitContainer1.Panel2MinSize = 30;
             this.splitContainer1.Size = new System.Drawing.Size(784, 461);
             this.splitContainer1.SplitterDistance = 425;
             this.splitContainer1.TabIndex = 1;
             // 
+            // toggleTXT
+            // 
+            this.toggleTXT.BorderColor = System.Drawing.Color.LightGray;
+            this.toggleTXT.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.toggleTXT.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.toggleTXT.IsOn = false;
+            this.toggleTXT.Location = new System.Drawing.Point(709, 3);
+            this.toggleTXT.Name = "toggleTXT";
+            this.toggleTXT.OffColor = System.Drawing.SystemColors.Control;
+            this.toggleTXT.OffText = "OFF";
+            this.toggleTXT.OnColor = System.Drawing.SystemColors.Control;
+            this.toggleTXT.OnText = "ON";
+            this.toggleTXT.Size = new System.Drawing.Size(50, 27);
+            this.toggleTXT.TabIndex = 15;
+            this.toggleTXT.Text = "TXT";
+            this.toggleTXT.TextEnabled = true;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(612, 9);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(98, 15);
+            this.label2.TabIndex = 14;
+            this.label2.Text = "另存裝置資訊於";
+            // 
             // btnOpenStorageDir
             // 
             this.btnOpenStorageDir.BackColor = System.Drawing.Color.LightSteelBlue;
             this.btnOpenStorageDir.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnOpenStorageDir.Location = new System.Drawing.Point(486, 5);
+            this.btnOpenStorageDir.Location = new System.Drawing.Point(533, 5);
             this.btnOpenStorageDir.Name = "btnOpenStorageDir";
-            this.btnOpenStorageDir.Size = new System.Drawing.Size(55, 23);
+            this.btnOpenStorageDir.Size = new System.Drawing.Size(69, 23);
             this.btnOpenStorageDir.TabIndex = 11;
-            this.btnOpenStorageDir.Text = "開啟";
+            this.btnOpenStorageDir.Text = "開啟位置";
             this.btnOpenStorageDir.UseVisualStyleBackColor = false;
             this.btnOpenStorageDir.Click += new System.EventHandler(this.btnOpenStorageDir_Click);
             // 
@@ -531,13 +531,11 @@ namespace ossaTool
         private System.Windows.Forms.Button btnEdl;
         private System.ComponentModel.BackgroundWorker bgWorkerEdl;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.Button btnUpdateTXT;
         private System.Windows.Forms.Label lblDHCP;
         private System.Windows.Forms.TextBox txtLog2;
         private System.Windows.Forms.Button btnGetIP;
         private System.Windows.Forms.Label lblPluginHint;
         private System.Windows.Forms.TextBox txtCountDown;
-        private System.Windows.Forms.Button btnUpdateCSV;
         private System.Windows.Forms.Button btnRPMBInitialize;
         private System.Windows.Forms.Button btnKeyBurn;
         private System.Windows.Forms.Button btnChangeStorage;
@@ -554,6 +552,8 @@ namespace ossaTool
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button btnOpenStorageDir;
+        private System.Windows.Forms.Label label2;
+        private Toggle toggleTXT;
     }
 }
 

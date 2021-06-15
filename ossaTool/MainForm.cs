@@ -57,6 +57,8 @@ namespace ossaTool
         private string _deviceSerialNumber = "";
         private string _macAddress = "";
         private string _key = "";
+        private bool _keyExisted = false;
+        private bool _provisionFinished = false;
         private string _keyboxPath = "";
         private readonly Process _p;
 
@@ -293,6 +295,13 @@ namespace ossaTool
             if (MessageBox.Show("USB 線接回去了嗎?", "溫馨提醒", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 #region get IP address
+                _p.StartInfo.Arguments = "root";
+                _p.Start();
+                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
+                _p.Close();
+
+                Thread.Sleep(1500);
+
                 _p.StartInfo.Arguments = "logcat -d | findstr LinkAddresses";
                 _p.Start();
                 _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
@@ -320,23 +329,20 @@ namespace ossaTool
                 txtLog2.Text += Environment.NewLine + "MAC address: [" + _macAddress + "]";
                 #endregion
 
-                //if (device_sn.Length != 0 && mac_address.Length != 0)
-                //{
-                btnUpdateCSV.Enabled = true;
-                btnUpdateTXT.Enabled = true;
-                btnRPMBInitialize.Enabled = true;
-                //}
+                if (_deviceSerialNumber.Length != 0 && _macAddress.Length != 0)
+                {
+                    btnRPMBInitialize.Enabled = true;
+                }
+                else
+                {
+                    MessageBox.Show("缺少 MAC address 與 序號 的機器無法燒錄金鑰","錯誤訊息",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                }
             }
         }
 
         private void btnRPMBInitialize_Click(object sender, EventArgs e)
         {
-            _p.StartInfo.Arguments = "root";
-            _p.Start();
-            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-            _p.Close();
-
-            Thread.Sleep(2000);
+            _provisionFinished = false;
 
             _p.StartInfo.Arguments = "shell echo '1' | qseecom_sample_client v smplap32 14 1";
             _p.Start();
@@ -359,8 +365,10 @@ namespace ossaTool
                 _p.Start();
                 _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
                 _p.Close();
+                _provisionFinished = true;
                 MessageBox.Show("RPMB 初始化完成, 待裝置重開機後可繼續燒金鑰步驟");
             }
+            CheckKeyBurnEnabled();
         }
 
         private void btnChangeKeyRepo_Click(object sender, EventArgs e)
@@ -380,8 +388,8 @@ namespace ossaTool
         {
             txtKeyboxPath.Text = Path.GetFileName(Properties.Settings.Default.KeyRepoPath);
             txtKeyName.Text = "無可使用之金鑰";
-            btnKeyBurn.Enabled = false;
             string[] subKeyboxDirs = Directory.GetDirectories(Properties.Settings.Default.KeyRepoPath);
+            _keyExisted = false;
             foreach (string keybox in subKeyboxDirs)
             {
                 string findPath = keybox + @"\keybox_output";
@@ -397,10 +405,16 @@ namespace ossaTool
                     _keyboxPath = files.First();
                     _key = keyFile.Substring(keyFile.IndexOf("_") + 1, 36);
                     txtKeyName.Text = _key;
-                    btnKeyBurn.Enabled = true;
+                    _keyExisted = true;
                     break;
                 }
             }
+            CheckKeyBurnEnabled();
+        }
+
+        private void CheckKeyBurnEnabled()
+        {
+            btnKeyBurn.Enabled = (_keyExisted && _provisionFinished);
         }
 
         private void btnKeyBurn_Click(object sender, EventArgs e)
@@ -433,15 +447,37 @@ namespace ossaTool
             _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
             _p.Close();
 
+            Thread.Sleep(1500);
+
             _p.StartInfo.Arguments = "push " + _keyboxPath + " /data";
             _p.Start();
             _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
             txtLog2.Text = _p.StandardOutput.ReadToEnd();
             _p.Close();
 
-
             if (MessageBox.Show("請開啟命令提示字元並於 Ctrl + V 執行以完成燒機步驟") == DialogResult.OK)
             {
+                string time = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
+                string filePrefix = $"{Properties.Settings.Default.FileStoragePath}/deviceInfoLog";
+                using (StreamWriter sw = new StreamWriter(new FileStream(filePrefix + ".csv", FileMode.Append, FileAccess.Write)))
+                {
+                    Debug.WriteLine("save CSV");
+                    if (sw.BaseStream.Position == 0)
+                    {
+                        sw.WriteLine("sep=,");
+                        sw.WriteLine("Date,Serial #,MAC address,Keybox Dir,Key");
+                    }
+                    sw.WriteLine(time + "," + _deviceSerialNumber + "," + _macAddress + "," + txtKeyboxPath.Text + "," + _key);
+                }
+                if (toggleTXT.IsOn)
+                {
+                    using StreamWriter sw = new StreamWriter(filePrefix + ".txt", true);
+                    if (sw.BaseStream.Position == 0)
+                        sw.WriteLine("Date//Serial #//MAC address//Keybox Dir//Key");
+                    sw.Write(time + "//" + _deviceSerialNumber + "//" + _macAddress + "//" + txtKeyboxPath.Text + "//");
+                    sw.WriteLine(_key);
+                }
+
                 string logPath = new DirectoryInfo(Properties.Settings.Default.FileStoragePath + String.Format("/provisioning_log_{0}.txt", _key)).FullName.Replace(@"\", "/");
                 string command = String.Format("adb shell \"LD_LIBRARY_PATH=/vendor/lib64/hw KmInstallKeybox /data/{0} {1} true\" > {2}", Path.GetFileName(_keyboxPath), _key, logPath);
 
@@ -453,8 +489,10 @@ namespace ossaTool
                     Directory.CreateDirectory(folder);
 
                 File.Move(_keyboxPath, folder + Path.GetFileName(_keyboxPath), true);
+                CheckKey();
             }
         }
+        #endregion
 
         private void btnChangeStorage_Click(object sender, EventArgs e)
         {
@@ -468,41 +506,11 @@ namespace ossaTool
             }
         }
 
-        private void btnUpdateTXT_Click(object sender, EventArgs e)
-        {
-            string path = $"{Properties.Settings.Default.FileStoragePath}/deviceInfoLog.txt";
-            using (StreamWriter sw = new StreamWriter(path, true))
-            {
-                if (sw.BaseStream.Position == 0)
-                    sw.WriteLine("Date//Serial #//MAC address//Keybox Dir//Key");
-                sw.Write(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss") + "//");
-                sw.Write(_deviceSerialNumber + "//");
-                sw.Write(_macAddress + "//");
-                sw.Write(txtKeyboxPath.Text + "//");
-                sw.WriteLine(_key);
-            }
-        }
-
-        private void btnUpdateCSV_Click(object sender, EventArgs e)
-        {
-            string path = $"{Properties.Settings.Default.FileStoragePath}/deviceInfoLog.csv";
-            using (StreamWriter sw = new StreamWriter(new FileStream(path, FileMode.Append, FileAccess.Write)))
-            {
-                if (sw.BaseStream.Position == 0)
-                {
-                    sw.WriteLine("sep=,");
-                    sw.WriteLine("Date,Serial #,MAC address,Keybox Dir,Key");
-                }
-                sw.WriteLine(DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss") + "," + _deviceSerialNumber + "," + _macAddress + "," + txtKeyboxPath.Text + "," + _key);
-            }
-        }
-        #endregion
-
         private void btnOpenStorageDir_Click(object sender, EventArgs e)
         {
             if (Directory.Exists(Properties.Settings.Default.FileStoragePath))
                 Process.Start(Environment.GetEnvironmentVariable("WINDIR") + @"\explorer.exe", Properties.Settings.Default.FileStoragePath);
         }
 
-    } }
+    } 
 }
