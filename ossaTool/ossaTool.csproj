@@ -8,6 +8,7 @@
     <Company>Ability Corp.</Company>
     <Authors>Android Rachel</Authors>
     <PackageIcon>logo.ico</PackageIcon>
+    <AssemblyVersion>1.0.7842.6095</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

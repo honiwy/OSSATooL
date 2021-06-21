@@ -15,7 +15,13 @@ namespace ossaTool
         public MainForm()
         {
             InitializeComponent();
+            if (Properties.Settings.Default.FileStoragePath=="")
+            {
+                Properties.Settings.Default.FileStoragePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                Properties.Settings.Default.Save();
+            }
             txtStoragePath.Text = Properties.Settings.Default.FileStoragePath;
+            _qfilLogPath = $"{Properties.Settings.Default.FileStoragePath}/flat_log.txt";
             txtQFILPath.Text = Properties.Settings.Default.QFILFilePath;
             txtKeyRepoPath.Text = Properties.Settings.Default.KeyRepoPath;
             toggleTXT.IsOn = Properties.Settings.Default.BoolSaveTxt;
@@ -36,7 +42,7 @@ namespace ossaTool
 
         private string _adbPath = "adb.exe";
         private string _qfilPath = @"C:\Program Files (x86)\Qualcomm\QPST\bin\qfil.exe";
-        private string _qfilLogPath = $"{Properties.Settings.Default.FileStoragePath}/flat_log.txt";
+        private string _qfilLogPath;
 
         private string _error = "失敗 :(";
         private string _success = "成功 :)";

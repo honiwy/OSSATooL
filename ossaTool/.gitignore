@@ -1,0 +1,5 @@
+*.[Cc]ache
+*.suo
+bin/
+obj/
+.vs/
