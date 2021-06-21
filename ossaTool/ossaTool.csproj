@@ -5,10 +5,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>logo.ico</ApplicationIcon>
-    <Company>Ability Corp.</Company>
-    <Authors>Android Rachel</Authors>
+    <Company>Ability Enterprise Co., Ltd.</Company>
+    <Authors>Android</Authors>
     <PackageIcon>logo.ico</PackageIcon>
-    <AssemblyVersion>1.0.7842.6095</AssemblyVersion>
+    <AssemblyVersion>1.0.7842.10440</AssemblyVersion>
+    <FileVersion>1.0.7842.10440</FileVersion>
+    <Product>OSSA tool</Product>
+    <PackageId>ossaTool</PackageId>
+    <Description>A total solution for process of Qualcomm Mobile Device flash, attestation key provision, and device management.</Description>
+    <AssemblyName>ossaTool</AssemblyName>
+    <Copyright>Copyright © 2021 Ability Co, ISBU department. All rights reserved.</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

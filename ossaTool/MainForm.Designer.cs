@@ -57,6 +57,10 @@ namespace ossaTool
             this.btnGetIP = new System.Windows.Forms.Button();
             this.lblPluginHint = new System.Windows.Forms.Label();
             this.txtCountDown = new System.Windows.Forms.TextBox();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.labelDescription = new System.Windows.Forms.Label();
+            this.labelAppInfo = new System.Windows.Forms.Label();
             this.btnChangeStorage = new System.Windows.Forms.Button();
             this.txtStoragePath = new System.Windows.Forms.TextBox();
             this.bgWorkerConnection = new System.ComponentModel.BackgroundWorker();
@@ -72,6 +76,8 @@ namespace ossaTool
             this.tabControlMenu.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.tabPage3.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -82,6 +88,7 @@ namespace ossaTool
             // 
             this.tabControlMenu.Controls.Add(this.tabPage1);
             this.tabControlMenu.Controls.Add(this.tabPage2);
+            this.tabControlMenu.Controls.Add(this.tabPage3);
             this.tabControlMenu.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlMenu.Location = new System.Drawing.Point(0, 0);
             this.tabControlMenu.Name = "tabControlMenu";
@@ -257,7 +264,6 @@ namespace ossaTool
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Step 2: 更新金鑰";
             this.tabPage2.Enter += new System.EventHandler(this.tabPage2_Enter);
-            this.tabPage2.Leave += new System.EventHandler(this.tabPage2_Leave);
             // 
             // label1
             // 
@@ -379,6 +385,53 @@ namespace ossaTool
             this.txtCountDown.ReadOnly = true;
             this.txtCountDown.Size = new System.Drawing.Size(50, 23);
             this.txtCountDown.TabIndex = 0;
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.BackColor = System.Drawing.Color.LightSlateGray;
+            this.tabPage3.Controls.Add(this.groupBox1);
+            this.tabPage3.Location = new System.Drawing.Point(4, 24);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(776, 397);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "關於";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.BackgroundImage = global::ossaTool.Properties.Resources.logo;
+            this.groupBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.groupBox1.Controls.Add(this.labelDescription);
+            this.groupBox1.Controls.Add(this.labelAppInfo);
+            this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.groupBox1.Font = new System.Drawing.Font("Segoe UI", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.groupBox1.ForeColor = System.Drawing.SystemColors.Control;
+            this.groupBox1.Location = new System.Drawing.Point(20, 11);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(735, 364);
+            this.groupBox1.TabIndex = 2;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "About";
+            // 
+            // labelDescription
+            // 
+            this.labelDescription.AutoSize = true;
+            this.labelDescription.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.labelDescription.Location = new System.Drawing.Point(30, 55);
+            this.labelDescription.Name = "labelDescription";
+            this.labelDescription.Size = new System.Drawing.Size(72, 19);
+            this.labelDescription.TabIndex = 2;
+            this.labelDescription.Text = "blablabla";
+            // 
+            // labelAppInfo
+            // 
+            this.labelAppInfo.AutoSize = true;
+            this.labelAppInfo.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.labelAppInfo.Location = new System.Drawing.Point(30, 279);
+            this.labelAppInfo.Name = "labelAppInfo";
+            this.labelAppInfo.Size = new System.Drawing.Size(72, 19);
+            this.labelAppInfo.TabIndex = 0;
+            this.labelAppInfo.Text = "blablabla";
             // 
             // btnChangeStorage
             // 
@@ -505,6 +558,9 @@ namespace ossaTool
             this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            this.tabPage3.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
@@ -555,6 +611,10 @@ namespace ossaTool
         private System.Windows.Forms.Button btnOpenStorageDir;
         private System.Windows.Forms.Label label2;
         private Toggle toggleTXT;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label labelAppInfo;
+        private System.Windows.Forms.Label labelDescription;
     }
 }
 

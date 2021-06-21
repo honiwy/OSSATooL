@@ -15,16 +15,8 @@ namespace ossaTool
         public MainForm()
         {
             InitializeComponent();
-            if (Properties.Settings.Default.FileStoragePath=="")
-            {
-                Properties.Settings.Default.FileStoragePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                Properties.Settings.Default.Save();
-            }
-            txtStoragePath.Text = Properties.Settings.Default.FileStoragePath;
-            _qfilLogPath = $"{Properties.Settings.Default.FileStoragePath}/flat_log.txt";
-            txtQFILPath.Text = Properties.Settings.Default.QFILFilePath;
-            txtKeyRepoPath.Text = Properties.Settings.Default.KeyRepoPath;
-            toggleTXT.IsOn = Properties.Settings.Default.BoolSaveTxt;
+            LoadAppInfo();
+            LoadSettingValue();
             CheckKey();
             _p = new Process
             {
@@ -38,6 +30,28 @@ namespace ossaTool
                     CreateNoWindow = true
                 }
             };
+        }
+
+        private void LoadAppInfo()
+        {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            groupBox1.Text = "About " + fvi.ProductName;
+            labelDescription.Text = "A total solution for the process of " + Environment.NewLine + "Qualcomm mobile device flash, attestation key provision, and device management.";
+            labelAppInfo.Text = fvi.ProductName + " " + fvi.FileVersion + Environment.NewLine + fvi.CompanyName + Environment.NewLine + fvi.LegalCopyright;
+        }
+        private void LoadSettingValue()
+        {
+            if (Properties.Settings.Default.FileStoragePath == "")
+            {
+                Properties.Settings.Default.FileStoragePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                Properties.Settings.Default.Save();
+            }
+            txtStoragePath.Text = Properties.Settings.Default.FileStoragePath;
+            _qfilLogPath = $"{Properties.Settings.Default.FileStoragePath}/flat_log.txt";
+            txtQFILPath.Text = Properties.Settings.Default.QFILFilePath;
+            txtKeyRepoPath.Text = Properties.Settings.Default.KeyRepoPath;
+            toggleTXT.IsOn = Properties.Settings.Default.BoolSaveTxt;
         }
 
         private string _adbPath = "adb.exe";
@@ -105,10 +119,12 @@ namespace ossaTool
                     break;
                 }
                 Thread.Sleep(300);
-                if (edlProcess) {
+                if (edlProcess)
+                {
                     bgWorkerEdl.ReportProgress(j);
                 }
-                else {
+                else
+                {
                     bgWorkerConnection.ReportProgress(j);
                 }
             }
@@ -282,19 +298,20 @@ namespace ossaTool
         #region tabpage 2
         private void tabPage2_Enter(object sender, EventArgs e)
         {
+            _timer.Stop();
             _timer.SetTime(0, 50);
             _timer.Start();
             _timer.TimeChanged += () => txtCountDown.Text = _timer.TimeLeftMsStr;
             _timer.StepMs = 77; // for nice milliseconds time switch
         }
 
-        private void tabPage2_Leave(object sender, EventArgs e)
-        {
-            _timer.Stop();
-        }
-
         private void btnGetIP_Click(object sender, EventArgs e)
         {
+            if(_timer.TimeLeft.TotalSeconds!=0)
+            {
+                MessageBox.Show("別心急, 倒數還沒結束呢!!");
+                return;
+            }
             if (MessageBox.Show("USB 線接回去了嗎?", "溫馨提醒", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 #region get IP address
@@ -338,8 +355,12 @@ namespace ossaTool
                 }
                 else
                 {
-                    MessageBox.Show("缺少 MAC address 與 序號 的機器無法燒錄金鑰","錯誤訊息",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                    MessageBox.Show("缺少 MAC address 與 序號 的機器無法燒錄金鑰", "錯誤訊息", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            }
+            else
+            {
+                MessageBox.Show("Oh no! 接回 USB 線才能取得相關訊息");
             }
         }
 
@@ -523,5 +544,6 @@ namespace ossaTool
             Properties.Settings.Default.BoolSaveTxt = toggleTXT.IsOn;
             Properties.Settings.Default.Save();
         }
-    } 
+
+    }
 }
