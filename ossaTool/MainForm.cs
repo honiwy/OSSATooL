@@ -322,13 +322,29 @@ namespace ossaTool
 
                 Thread.Sleep(1500);
 
-                _p.StartInfo.Arguments = "logcat -d | findstr LinkAddresses";
+                _p.StartInfo.Arguments = "shell am broadcast -a com.avc.app.fqctool.action.EXEC_CMD -n com.avc.avcfqctool/.receiver.ShellCmdReceiver";
+                _p.Start();
+                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
+                _p.Close();
+
+                Thread.Sleep(1500);
+                                                    
+                _p.StartInfo.Arguments = "shell cat /sdcard/fqc_file/fqc_app_result.txt";
                 _p.Start();
                 _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
                 _processLog = _p.StandardOutput.ReadToEnd();
                 _p.Close();
-                MatchCollection matchCollection = new Regex(@"LinkAddresses.+?(?=\])").Matches(_processLog);
-                txtLog2.Text = (matchCollection.Count > 0) ? matchCollection[0].ToString() : "請拔除USB線後靜待 5秒再重新測試";
+
+                MatchCollection matchCollection = new Regex(@"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}").Matches(_processLog);
+                txtLog2.Text = (matchCollection.Count > 0) ? "IP Adderesses :[" + matchCollection[0].ToString() + "]" : "請拔除USB線後靜待 5秒再重新測試";
+
+                //_p.StartInfo.Arguments = "logcat -d | findstr LinkAddresses";
+                //_p.Start();
+                //_p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
+                //_processLog = _p.StandardOutput.ReadToEnd();
+                //_p.Close();
+                //MatchCollection matchCollection = new Regex(@"LinkAddresses.+?(?=\])").Matches(_processLog);
+                //txtLog2.Text = (matchCollection.Count > 0) ? matchCollection[0].ToString() : "請拔除USB線後靜待 5秒再重新測試";
                 #endregion
 
                 #region get device serial number
