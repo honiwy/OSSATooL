@@ -7,6 +7,7 @@ using System.Threading;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO.Ports;
 
 namespace ossaTool
 {
@@ -223,9 +224,22 @@ namespace ossaTool
             bgWorkerQFIL.RunWorkerAsync();
         }
 
+        private int getCOMPort()
+        {
+            // Get a list of serial port names.
+            string[] ports = SerialPort.GetPortNames();
+            int port = 7;
+            if (ports.Length > 0)
+            {
+                Int32.TryParse(ports[0].Replace("COM", ""), out port);
+            }
+            return port;
+
+        }
+
         private void QFILProcess(DoWorkEventArgs e)
         {
-            string argument = "-Mode=3 -downloadflat -COM=7  -Programmer=true;\"" + Properties.Settings.Default.QFILFilePath + "\" -deviceType=\"emmc\" - VALIDATIONMODE=2 " +
+            string argument = "-Mode=3 -downloadflat -COM="+ getCOMPort() + "  -Programmer=true;\"" + Properties.Settings.Default.QFILFilePath + "\" -deviceType=\"emmc\" - VALIDATIONMODE=2 " +
                 "-SWITCHTOFIREHOSETIMEOUT=50 -RESETTIMEOUT=500 -RESETDELAYTIME=5 -RESETAFTERDOWNLOAD=true -MaxPayloadSizeToTargetInBytes=true;49152 -searchpath=\"" +
                 Path.GetDirectoryName(Properties.Settings.Default.QFILFilePath) + "\" -Rawprogram=\"rawprogram_unsparse.xml\" -Patch=\"patch0.xml\" -logfilepath=\"" + _qfilLogPath + "\"";
 
