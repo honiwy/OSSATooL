@@ -53,6 +53,12 @@ namespace ossaTool
             txtQFILPath.Text = Properties.Settings.Default.QFILFilePath;
             txtKeyRepoPath.Text = Properties.Settings.Default.KeyRepoPath;
             toggleTXT.IsOn = Properties.Settings.Default.BoolSaveTxt;
+
+            comboBox1.Items.Add("BST_BULLET");
+            comboBox1.Items.Add("BST_VD2");
+            comboBox1.Items.Add("BST_MD2");
+            comboBox1.Items.Add("Generic");
+            comboBox1.Text = Properties.Settings.Default.SkuIdSaveInfo;
         }
 
         private string _adbPath = "adb.exe";
@@ -74,6 +80,7 @@ namespace ossaTool
         private CountDownTimer _timer = new CountDownTimer();
         private string _deviceSerialNumber = "";
         private string _macAddress = "";
+        private string _skuId = "";
         private string _key = "";
         private bool _keyExisted = false;
         private bool _provisionFinished = false;
@@ -336,29 +343,29 @@ namespace ossaTool
 
                 Thread.Sleep(1500);
 
-                _p.StartInfo.Arguments = "shell am broadcast -a com.avc.app.fqctool.action.EXEC_CMD -n com.avc.avcfqctool/.receiver.ShellCmdReceiver";
-                _p.Start();
-                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-                _p.Close();
+                //_p.StartInfo.Arguments = "shell am broadcast -a com.avc.app.fqctool.action.EXEC_CMD -n com.avc.avcfqctool/.receiver.ShellCmdReceiver";
+                //_p.Start();
+                //_p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
+                //_p.Close();
 
-                Thread.Sleep(1500);
+                //Thread.Sleep(1500);
                                                     
-                _p.StartInfo.Arguments = "shell cat /sdcard/fqc_file/fqc_app_result.txt";
-                _p.Start();
-                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-                _processLog = _p.StandardOutput.ReadToEnd();
-                _p.Close();
-
-                MatchCollection matchCollection = new Regex(@"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}").Matches(_processLog);
-                txtLog2.Text = (matchCollection.Count > 0) ? "IP Adderesses :[" + matchCollection[0].ToString() + "]" : "請拔除USB線後靜待 5秒再重新測試";
-
-                //_p.StartInfo.Arguments = "logcat -d | findstr LinkAddresses";
+                // _p.StartInfo.Arguments = "shell cat /sdcard/fqc_file/fqc_app_result.txt";
                 //_p.Start();
                 //_p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
                 //_processLog = _p.StandardOutput.ReadToEnd();
                 //_p.Close();
-                //MatchCollection matchCollection = new Regex(@"LinkAddresses.+?(?=\])").Matches(_processLog);
-                //txtLog2.Text = (matchCollection.Count > 0) ? matchCollection[0].ToString() : "請拔除USB線後靜待 5秒再重新測試";
+
+                //MatchCollection matchCollection = new Regex(@"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}").Matches(_processLog);
+                //txtLog2.Text = (matchCollection.Count > 0) ? "IP Adderesses :[" + matchCollection[0].ToString() + "]" : "請拔除USB線後靜待 5秒再重新測試";
+
+                _p.StartInfo.Arguments = "logcat -d | findstr LinkAddresses";
+                _p.Start();
+                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
+                _processLog = _p.StandardOutput.ReadToEnd();
+                _p.Close();
+                MatchCollection matchCollection = new Regex(@"LinkAddresses.+?(?=\])").Matches(_processLog);
+                txtLog2.Text = (matchCollection.Count > 0) ? matchCollection[0].ToString() : "請拔除USB線後靜待 5秒再重新測試";
                 #endregion
 
                 #region get device serial number
@@ -377,6 +384,25 @@ namespace ossaTool
                 _macAddress = _p.StandardOutput.ReadToEnd().Replace("\n", "").Replace("\r", "");
                 _p.Close();
                 txtLog2.Text += Environment.NewLine + "MAC address: [" + _macAddress + "]";
+                #endregion
+
+                #region write sku ID
+
+                string sku_id = Properties.Settings.Default.SkuIdSaveInfo;
+
+                _p.StartInfo.Arguments = "shell echo '" + sku_id + "' > /avc_info/sku_id";
+                _p.Start();
+                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
+                _p.Close();
+                #endregion
+
+                #region get device sku ID
+                _p.StartInfo.Arguments = "shell cat /avc_info/sku_id";
+                _p.Start();
+                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
+                _skuId = _p.StandardOutput.ReadToEnd().Replace("\n", "").Replace("\r", "");
+                _p.Close();
+                txtLog2.Text += Environment.NewLine + "Sku ID : [" + _skuId + "]";
                 #endregion
 
                 if (_deviceSerialNumber.Length != 0 && _macAddress.Length != 0)
@@ -575,5 +601,33 @@ namespace ossaTool
             Properties.Settings.Default.Save();
         }
 
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+
+            switch ((string)comboBox1.SelectedItem) {
+                case "BST_BULLET":
+                    Properties.Settings.Default.SkuIdSaveInfo = "BST_BULLET";
+                    Properties.Settings.Default.Save();
+                    break;
+                case "BST_VD2":
+                    Properties.Settings.Default.SkuIdSaveInfo = "BST_DOME";
+                    Properties.Settings.Default.Save();
+                    break;
+                case "BST_MD2":
+                    Properties.Settings.Default.SkuIdSaveInfo = "BST_MD2";
+                    Properties.Settings.Default.Save();
+                    break;
+                case "Generic":
+                    Properties.Settings.Default.SkuIdSaveInfo = "Generic";
+                    Properties.Settings.Default.Save();
+                    break;
+                default:
+                    Properties.Settings.Default.SkuIdSaveInfo = "Generic";
+                    Properties.Settings.Default.Save();
+                    break;
+
+            }
+        }
     }
 }
