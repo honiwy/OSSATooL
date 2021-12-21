@@ -433,23 +433,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\avc\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\user\\.nuget\\packages\\": {},
+    "D:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\OSSA_new\\ossaTool\\ossaTool.csproj",
+      "projectUniqueName": "D:\\AVC_work\\ossa_pc_tool\\ossaTool\\ossaTool.csproj",
       "projectName": "ossaTool",
-      "projectPath": "D:\\OSSA_new\\ossaTool\\ossaTool.csproj",
-      "packagesPath": "C:\\Users\\avc\\.nuget\\packages\\",
-      "outputPath": "D:\\OSSA_new\\ossaTool\\obj\\",
+      "projectPath": "D:\\AVC_work\\ossa_pc_tool\\ossaTool\\ossaTool.csproj",
+      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+      "outputPath": "D:\\AVC_work\\ossa_pc_tool\\ossaTool\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        "D:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\avc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -499,7 +499,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.300\\RuntimeIdentifierGraph.json"
       }
     }
   }
