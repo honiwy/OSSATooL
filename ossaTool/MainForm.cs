@@ -19,18 +19,7 @@ namespace ossaTool
             LoadAppInfo();
             LoadSettingValue();
             CheckKey();
-            _p = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = _adbPath,
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                }
-            };
+        
         }
 
         private void LoadAppInfo()
@@ -53,15 +42,10 @@ namespace ossaTool
             txtQFILPath.Text = Properties.Settings.Default.QFILFilePath;
             txtKeyRepoPath.Text = Properties.Settings.Default.KeyRepoPath;
             toggleTXT.IsOn = Properties.Settings.Default.BoolSaveTxt;
-
-            comboBox1.Items.Add("BST_BULLET");
-            comboBox1.Items.Add("BST_VD2");
-            comboBox1.Items.Add("BST_MD2");
-            comboBox1.Items.Add("Generic");
-            comboBox1.Text = Properties.Settings.Default.SkuIdSaveInfo;
+            comBoxSku.Text = Properties.Settings.Default.SkuIdSaveInfo;
         }
 
-        private string _adbPath = "adb.exe";
+      
         private string _qfilPath = @"C:\Program Files (x86)\Qualcomm\QPST\bin\qfil.exe";
         private string _qfilLogPath;
 
@@ -85,13 +69,14 @@ namespace ossaTool
         private bool _keyExisted = false;
         private bool _provisionFinished = false;
         private string _keyboxPath = "";
-        private readonly Process _p;
+
 
         #region tabpage 1
         private void btn1Connect_Click(object sender, EventArgs e)
         {
             txt1ConnectionStatus.Text = _pleaseWait;
             btn1ConnectCheck.Enabled = false;
+            btnEdl.Enabled = false;
             _connectionStatus = false;
             bgWorkerConnection.RunWorkerAsync();
         }
@@ -106,11 +91,7 @@ namespace ossaTool
             Regex rgx = new Regex("device");
             for (int j = 0; j < 100; j++)
             {
-                _p.StartInfo.Arguments = "devices";
-                _p.Start();
-                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-                _processLog = _p.StandardOutput.ReadToEnd();
-                _p.Close();
+                _processLog = AdbOperation.CheckDeviceConnection();
                 if (rgx.Matches(_processLog).Count == 1 && edlProcess)
                 {
                     bgWorkerEdl.ReportProgress(100);
@@ -150,12 +131,11 @@ namespace ossaTool
             {
                 txt1ConnectionStatus.Text = _success;
                 btnEdl.Enabled = true;
-                txtLog.Text = _processLog;
+                txtLog.Text = $"{ _processLog}Brand: {AdbOperation.CheckDeviceBrand()}\r\nVersion: {AdbOperation.CheckDeviceVersion()}";
             }
             else
             {
                 txt1ConnectionStatus.Text = _error;
-                btnEdl.Enabled = false;
                 txtLog.Text = _errLog;
             }
         }
@@ -165,10 +145,7 @@ namespace ossaTool
             txt1EdlStatus.Text = _pleaseWait;
             btnEdl.Enabled = false;
             _rebootEdlStatus = false;
-            _p.StartInfo.Arguments = "reboot edl";
-            _p.Start();
-            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-            _p.Close();
+            AdbOperation.RebootAndEnterEDL();
             bgWorkerEdl.RunWorkerAsync();
         }
 
@@ -184,7 +161,6 @@ namespace ossaTool
 
         private void bgWorkerEdl_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            btnEdl.Enabled = true;
             if (_rebootEdlStatus)
             {
                 txt1EdlStatus.Text = _success;
@@ -226,27 +202,16 @@ namespace ossaTool
                 MessageBox.Show("燒機檔案格式不正確, 請重新確認");
                 return;
             }
+            _processLog = "";
+            _qfilStatus = false;
             txt1QFILStatus.Text = _pleaseWait;
-            btnQFIL.Enabled = false;
+            tabControlMenu.Enabled = false;
             bgWorkerQFIL.RunWorkerAsync();
-        }
-
-        private int getCOMPort()
-        {
-            // Get a list of serial port names.
-            string[] ports = SerialPort.GetPortNames();
-            int port = 7;
-            if (ports.Length > 0)
-            {
-                Int32.TryParse(ports[0].Replace("COM", ""), out port);
-            }
-            return port;
-
         }
 
         private void QFILProcess(DoWorkEventArgs e)
         {
-            string argument = "-Mode=3 -downloadflat -COM="+ getCOMPort() + "  -Programmer=true;\"" + Properties.Settings.Default.QFILFilePath + "\" -deviceType=\"emmc\" - VALIDATIONMODE=2 " +
+            string argument = "-Mode=3 -downloadflat -COM="+ Util.GetCOMPort() + "  -Programmer=true;\"" + Properties.Settings.Default.QFILFilePath + "\" -deviceType=\"emmc\" - VALIDATIONMODE=2 " +
                 "-SWITCHTOFIREHOSETIMEOUT=50 -RESETTIMEOUT=500 -RESETDELAYTIME=5 -RESETAFTERDOWNLOAD=true -MaxPayloadSizeToTargetInBytes=true;49152 -searchpath=\"" +
                 Path.GetDirectoryName(Properties.Settings.Default.QFILFilePath) + "\" -Rawprogram=\"rawprogram_unsparse.xml\" -Patch=\"patch0.xml\" -logfilepath=\"" + _qfilLogPath + "\"";
 
@@ -294,16 +259,17 @@ namespace ossaTool
             txtLog.Text = _processLog;
             txtLog.SelectionStart = txtLog.TextLength;
             txtLog.ScrollToCaret();
-            if (e.ProgressPercentage > 20 && new Regex("Finish Download").Matches(_processLog).Count == 1 && new Regex("Download Succeed").Matches(_processLog).Count == 1)
+            if (e.ProgressPercentage > 20 && Util.CheckQFilSuccessful(_processLog))
                 _qfilStatus = true;
         }
 
         private void bgWorkerQFIL_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            btnQFIL.Enabled = true;
+            tabControlMenu.Enabled = true;
             if (_qfilStatus)
             {
                 txt1QFILStatus.Text = _success;
+
                 DialogResult result = MessageBox.Show("拔除 USB 線後, 請依 Step 2 指示操作");
                 if (result == DialogResult.OK)
                     tabControlMenu.SelectedIndex = 1;
@@ -335,83 +301,51 @@ namespace ossaTool
             }
             if (MessageBox.Show("USB 線接回去了嗎?", "溫馨提醒", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                #region get IP address
-                _p.StartInfo.Arguments = "root";
-                _p.Start();
-                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-                _p.Close();
+                Thread.Sleep(1200);
+                string currentBrand = AdbOperation.CheckDeviceBrand();
 
-                Thread.Sleep(1500);
-
-                //_p.StartInfo.Arguments = "shell am broadcast -a com.avc.app.fqctool.action.EXEC_CMD -n com.avc.avcfqctool/.receiver.ShellCmdReceiver";
-                //_p.Start();
-                //_p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-                //_p.Close();
-
-                //Thread.Sleep(1500);
-                                                    
-                // _p.StartInfo.Arguments = "shell cat /sdcard/fqc_file/fqc_app_result.txt";
-                //_p.Start();
-                //_p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-                //_processLog = _p.StandardOutput.ReadToEnd();
-                //_p.Close();
-
-                //MatchCollection matchCollection = new Regex(@"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}").Matches(_processLog);
-                //txtLog2.Text = (matchCollection.Count > 0) ? "IP Adderesses :[" + matchCollection[0].ToString() + "]" : "請拔除USB線後靜待 5秒再重新測試";
-
-                _p.StartInfo.Arguments = "logcat -d | findstr LinkAddresses";
-                _p.Start();
-                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-                _processLog = _p.StandardOutput.ReadToEnd();
-                _p.Close();
-                MatchCollection matchCollection = new Regex(@"LinkAddresses.+?(?=\])").Matches(_processLog);
-                txtLog2.Text = (matchCollection.Count > 0) ? matchCollection[0].ToString() : "請拔除USB線後靜待 5秒再重新測試";
-                #endregion
-
-                #region get device serial number
-                _p.StartInfo.Arguments = "shell cat /avc_info/device_sn";
-                _p.Start();
-                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-                _deviceSerialNumber = _p.StandardOutput.ReadToEnd().Replace("\n", "").Replace("\r", "");
-                _p.Close();
-                txtLog2.Text += Environment.NewLine + "Serial number: [" + _deviceSerialNumber + "]";
-                #endregion
-
-                #region get device mac address
-                _p.StartInfo.Arguments = "shell cat /avc_info/mac_address";
-                _p.Start();
-                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-                _macAddress = _p.StandardOutput.ReadToEnd().Replace("\n", "").Replace("\r", "");
-                _p.Close();
-                txtLog2.Text += Environment.NewLine + "MAC address: [" + _macAddress + "]";
-                #endregion
-
-                #region write sku ID
-
-                string sku_id = Properties.Settings.Default.SkuIdSaveInfo;
-
-                _p.StartInfo.Arguments = "shell echo '" + sku_id + "' > /avc_info/sku_id";
-                _p.Start();
-                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-                _p.Close();
-                #endregion
-
-                #region get device sku ID
-                _p.StartInfo.Arguments = "shell cat /avc_info/sku_id";
-                _p.Start();
-                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-                _skuId = _p.StandardOutput.ReadToEnd().Replace("\n", "").Replace("\r", "");
-                _p.Close();
-                txtLog2.Text += Environment.NewLine + "Sku ID : [" + _skuId + "]";
-                #endregion
-
-                if (_deviceSerialNumber.Length != 0 && _macAddress.Length != 0)
+                if (currentBrand != "SnST")
                 {
-                    btnRPMBInitialize.Enabled = true;
+                    AdbOperation.RebootAndEnterEDL();
+                    MessageBox.Show($"目前為 {currentBrand} 應為 SnST, 請修正檔案後重新燒錄", "商標有誤");
+                    tabControlMenu.SelectedIndex = 0;
                 }
                 else
                 {
-                    MessageBox.Show("缺少 MAC address 與 序號 的機器無法燒錄金鑰", "錯誤訊息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    #region get IP address
+                    AdbOperation.GiveRootAccess();
+                    Thread.Sleep(800);
+
+                    _processLog = AdbOperation.LogAddress();
+                    string ipAddress = Util.GetIPAddress(_processLog);
+                    txtLog2.Text = (ipAddress.Length>0) ? $"IP address: [{ipAddress}]" : "請拔除USB線後靜待 5秒再重新測試";
+                    #endregion
+
+                    #region device serial number
+                    _deviceSerialNumber = AdbOperation.CheckSerialNumber();
+                    txtLog2.Text += Environment.NewLine + $"Serial number: [{_deviceSerialNumber}]";
+                    #endregion
+
+                    #region device mac address
+                    _macAddress = AdbOperation.CheckMacAddress();
+                    txtLog2.Text += Environment.NewLine + $"MAC address: [{ _macAddress}]";
+                    #endregion
+
+                    #region skuID
+                    AdbOperation.WriteSkuId();
+                    _skuId = AdbOperation.CheckSkuId();
+                    txtLog2.Text += Environment.NewLine + $"Sku ID : [{_skuId}]";
+                    #endregion
+
+                    if (_deviceSerialNumber.Length != 0 && _macAddress.Length != 0)
+                    {
+                        btnRPMBInitialize.Enabled = true;
+                    }
+                    else
+                    {
+                        MessageBox.Show("缺少 MAC address 與 序號 的機器無法燒錄金鑰", "錯誤訊息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
             else
@@ -420,31 +354,24 @@ namespace ossaTool
             }
         }
 
+        private void comBoxSku_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.SkuIdSaveInfo = ((string)comBoxSku.SelectedItem == "BST_VD2") ? "BST_DOME" : (string)comBoxSku.SelectedItem;
+            Properties.Settings.Default.Save();
+        }
+
         private void btnRPMBInitialize_Click(object sender, EventArgs e)
         {
             _provisionFinished = false;
 
-            _p.StartInfo.Arguments = "shell echo '1' | qseecom_sample_client v smplap32 14 1";
-            _p.Start();
-            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-            txtLog2.Text = _p.StandardOutput.ReadToEnd();
-            _p.Close();
-
-            _p.StartInfo.Arguments = "shell echo '2' | qseecom_sample_client v smplap32 14 1";
-            _p.Start();
-            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-            txtLog2.Text += _p.StandardOutput.ReadToEnd();
-            _p.Close();
-
+            AdbOperation.InitializeRPMB();
+            txtLog2.Text = AdbOperation.CheckRPMBStatus();
             txtLog2.SelectionStart = txtLog2.TextLength;
             txtLog2.ScrollToCaret();
 
-            if (new Regex("RPMB_KEY_PROVISIONED_AND_OK").Matches(txtLog2.Text).Count == 1)
+            if (Util.CheckRPMBSuccessful(txtLog2.Text))
             {
-                _p.StartInfo.Arguments = "reboot";
-                _p.Start();
-                _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-                _p.Close();
+                AdbOperation.RebootDevice();
                 _provisionFinished = true;
                 MessageBox.Show("RPMB 初始化完成, 待裝置重開機後可繼續燒金鑰步驟");
             }
@@ -514,29 +441,19 @@ namespace ossaTool
                 return;
             }
 
-            _p.StartInfo.Arguments = "shell getprop ro.product.board";
-            _p.Start();
-            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-            string deviceType = _p.StandardOutput.ReadToEnd().Replace("\n", "").Replace("\r", "");
-            _p.Close();
+            string deviceType = AdbOperation.CheckBoard();
             if (!deviceType.Equals("qcs605") && !deviceType.Equals("qcs603"))
             {
                 MessageBox.Show("目前不支援 " + deviceType + "裝置種類, 請聯繫客服!");
                 return;
             }
 
-            _p.StartInfo.Arguments = "root";
-            _p.Start();
-            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-            _p.Close();
+            AdbOperation.GiveRootAccess();
 
             Thread.Sleep(1500);
 
-            _p.StartInfo.Arguments = "push " + _keyboxPath + " /data";
-            _p.Start();
-            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
-            txtLog2.Text = _p.StandardOutput.ReadToEnd();
-            _p.Close();
+            txtLog2.Text = AdbOperation.PushKeyFile(_keyboxPath);
+
 
             if (MessageBox.Show("請開啟命令提示字元並於 Ctrl + V 執行以完成燒機步驟") == DialogResult.OK)
             {
@@ -573,6 +490,8 @@ namespace ossaTool
 
                 File.Move(_keyboxPath, folder + Path.GetFileName(_keyboxPath), true);
                 CheckKey();
+
+                //Process.Start(new ProcessStartInfo("http://172.16.116.188") { UseShellExecute = true });
             }
         }
         #endregion
@@ -601,33 +520,6 @@ namespace ossaTool
             Properties.Settings.Default.Save();
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-
-            switch ((string)comboBox1.SelectedItem) {
-                case "BST_BULLET":
-                    Properties.Settings.Default.SkuIdSaveInfo = "BST_BULLET";
-                    Properties.Settings.Default.Save();
-                    break;
-                case "BST_VD2":
-                    Properties.Settings.Default.SkuIdSaveInfo = "BST_DOME";
-                    Properties.Settings.Default.Save();
-                    break;
-                case "BST_MD2":
-                    Properties.Settings.Default.SkuIdSaveInfo = "BST_MD2";
-                    Properties.Settings.Default.Save();
-                    break;
-                case "Generic":
-                    Properties.Settings.Default.SkuIdSaveInfo = "Generic";
-                    Properties.Settings.Default.Save();
-                    break;
-                default:
-                    Properties.Settings.Default.SkuIdSaveInfo = "Generic";
-                    Properties.Settings.Default.Save();
-                    break;
-
-            }
-        }
+      
     }
 }

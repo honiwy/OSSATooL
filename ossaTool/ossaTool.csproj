@@ -8,8 +8,8 @@
     <Company>Ability Enterprise Co., Ltd.</Company>
     <Authors>Android</Authors>
     <PackageIcon>logo.ico</PackageIcon>
-    <AssemblyVersion>1.0.7880.7152</AssemblyVersion>
-    <FileVersion>1.0.7880.7152</FileVersion>
+    <AssemblyVersion>1.0.8026.16933</AssemblyVersion>
+    <FileVersion>1.0.8026.16933</FileVersion>
     <Product>OSSA tool</Product>
     <PackageId>ossaTool</PackageId>
     <Description>A total solution for process of Qualcomm Mobile Device flash, attestation key provision, and device management.</Description>
