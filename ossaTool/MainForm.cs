@@ -446,7 +446,7 @@ namespace ossaTool
 
         private void CheckKeyBurnEnabled()
         {
-            btnKeyBurn.Enabled = (_keyExisted && _provisionFinished);
+            btnKeyBurn.Enabled = (_keyExisted) && _provisionFinished);
         }
 
         private void btnKeyBurn_Click(object sender, EventArgs e)
