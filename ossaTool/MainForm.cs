@@ -1,13 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows.Forms;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using System.IO.Ports;
+using System.Diagnostics;
 
 namespace ossaTool
 {
@@ -58,6 +56,7 @@ namespace ossaTool
         private bool _connectionStatus = false;
         private bool _rebootEdlStatus = false;
         private bool _qfilStatus = false;
+        private bool _attestionKeyStatus = false;
         private string _rebootEdlSuccessLog = "切換成功!\r\n可進行後續燒機";
         private string _qfilErrLog = "狀態異常!\r\n請確認硬體是否異常\r\n請確認 USB 或網路線是否脫落";
 
@@ -318,13 +317,18 @@ namespace ossaTool
             if (MessageBox.Show("USB 線接回去了嗎?", "溫馨提醒", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 string currentBrand = "";
-                while (currentBrand.Length == 0)
+                int retryChance = 10;
+                while (currentBrand.Length == 0 && retryChance > 0)
                 {
                     Thread.Sleep(2000);
                     currentBrand = AdbOperation.CheckDeviceBrand();
+                    retryChance--;
                 }
 
-                if (currentBrand != "SnST")
+                if (currentBrand.Length == 0) {
+                    MessageBox.Show("好像沒有正確連接 USB 線唷");
+                }
+                else if (currentBrand != "SnST")
                 {
                     AdbOperation.RebootAndEnterEDL();
                     MessageBox.Show($"目前為 {currentBrand} 應為 SnST, 請修正檔案後重新燒錄", "商標有誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -459,54 +463,90 @@ namespace ossaTool
                 return;
             }
 
-    
-
             AdbOperation.GiveRootAccess();
 
             Thread.Sleep(1500);
 
             txtLog2.Text = AdbOperation.PushKeyFile(_keyboxPath);
 
+            bgWorkerAttestionKey.RunWorkerAsync();
+        }
 
-            if (MessageBox.Show("請開啟命令提示字元並於 Ctrl + V 執行以完成燒機步驟") == DialogResult.OK)
+        private void bgWorkerAttestionKey_DoWork(object sender, DoWorkEventArgs e)
+        {
+            CheckAttestionResult(e);
+        }
+        private void CheckAttestionResult(DoWorkEventArgs e)
+        {
+            #region update csv
+            string time = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
+            string filePrefix = $"{Properties.Settings.Default.FileStoragePath}/deviceInfoLog";
+            using (StreamWriter sw = new StreamWriter(new FileStream(filePrefix + ".csv", FileMode.Append, FileAccess.Write)))
             {
-                string time = DateTime.Now.ToString("MM/dd/yyyy HH:mm:ss");
-                string filePrefix = $"{Properties.Settings.Default.FileStoragePath}/deviceInfoLog";
-                using (StreamWriter sw = new StreamWriter(new FileStream(filePrefix + ".csv", FileMode.Append, FileAccess.Write)))
+                Debug.WriteLine("save CSV");
+                if (sw.BaseStream.Position == 0)
                 {
-                    Debug.WriteLine("save CSV");
-                    if (sw.BaseStream.Position == 0)
-                    {
-                        sw.WriteLine("sep=,");
-                        sw.WriteLine("Date,Serial #,MAC address,Keybox Dir,Key");
-                    }
-                    sw.WriteLine(time + "," + _deviceSerialNumber + "," + _macAddress + "," + txtKeyboxPath.Text + "," + _key);
+                    sw.WriteLine("sep=,");
+                    sw.WriteLine("Date,Serial #,MAC address,Keybox Dir,Key");
                 }
-                if (toggleTXT.IsOn)
+                sw.WriteLine(time + "," + _deviceSerialNumber + "," + _macAddress + "," + txtKeyboxPath.Text + "," + _key);
+            }
+            if (toggleTXT.IsOn)
+            {
+                using StreamWriter sw = new StreamWriter(filePrefix + ".txt", true);
+                if (sw.BaseStream.Position == 0)
+                    sw.WriteLine("Date//Serial #//MAC address//Keybox Dir//Key");
+                sw.Write(time + "//" + _deviceSerialNumber + "//" + _macAddress + "//" + txtKeyboxPath.Text + "//");
+                sw.WriteLine(_key);
+            }
+            #endregion
+
+            _processLog =  AdbOperation.WriteKeyFile(_keyboxPath, _key);
+
+            for (int checkPoint = 0; checkPoint <= 100; checkPoint++)
+            {
+                if (Util.CheckAttestionKeySuccessful(_processLog))
                 {
-                    using StreamWriter sw = new StreamWriter(filePrefix + ".txt", true);
-                    if (sw.BaseStream.Position == 0)
-                        sw.WriteLine("Date//Serial #//MAC address//Keybox Dir//Key");
-                    sw.Write(time + "//" + _deviceSerialNumber + "//" + _macAddress + "//" + txtKeyboxPath.Text + "//");
-                    sw.WriteLine(_key);
+                    bgWorkerAttestionKey.ReportProgress(100);
+                    _attestionKeyStatus = true;
+                    e.Cancel = true;
+                    break;
+                }else if (Util.CheckAttestionKeyWrong(_processLog))
+                {
+                    bgWorkerAttestionKey.ReportProgress(100);
+                    _attestionKeyStatus = false;
+                    e.Cancel = true;
+                    break;
                 }
+                Thread.Sleep(150);
+                bgWorkerAttestionKey.ReportProgress(checkPoint);
+            }
 
-                string logPath = new DirectoryInfo(Properties.Settings.Default.FileStoragePath + String.Format("/provisioning_log_{0}.txt", _key)).FullName.Replace(@"\", "/");
-                string command = String.Format("adb shell \"LD_LIBRARY_PATH=/vendor/lib64/hw KmInstallKeybox /data/{0} {1} true\" > {2}", Path.GetFileName(_keyboxPath), _key, logPath);
+        }
+        private void bgWorkerAttestionKey_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+        }
 
-                txtLog2.Text += Environment.NewLine + command;
-                Clipboard.SetText(command);
-
+        private void bgWorkerAttestionKey_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            txtLog2.Text += _processLog;
+            if (_attestionKeyStatus)
+            {
+                #region update used key
                 string folder = Path.GetDirectoryName(_keyboxPath) + @"\used\";
                 if (!Directory.Exists(folder))
                     Directory.CreateDirectory(folder);
 
                 File.Move(_keyboxPath, folder + Path.GetFileName(_keyboxPath), true);
                 CheckKey();
-
-                //Process.Start(new ProcessStartInfo("http://172.16.116.188") { UseShellExecute = true });
+                #endregion
+                if (MessageBox.Show("USB 線拔掉後按下 OK 以開啟網站", "燒錄完成", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                {
+                    Process.Start(new ProcessStartInfo($"http://{_ipAddress}") { UseShellExecute = true });
+                }
             }
         }
+
         #endregion
 
         private void btnChangeStorage_Click(object sender, EventArgs e)
@@ -525,6 +565,7 @@ namespace ossaTool
         {
             if (Directory.Exists(Properties.Settings.Default.FileStoragePath))
                 Process.Start(Environment.GetEnvironmentVariable("WINDIR") + @"\explorer.exe", Properties.Settings.Default.FileStoragePath);
+
         }
 
         private void toggleTXT_Click(object sender, EventArgs e)
@@ -533,6 +574,6 @@ namespace ossaTool
             Properties.Settings.Default.Save();
         }
 
-      
+       
     }
 }

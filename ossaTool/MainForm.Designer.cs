@@ -69,6 +69,7 @@ namespace ossaTool
             this.bgWorkerConnection = new System.ComponentModel.BackgroundWorker();
             this.bgWorkerQFIL = new System.ComponentModel.BackgroundWorker();
             this.bgWorkerEdl = new System.ComponentModel.BackgroundWorker();
+            this.bgWorkerAttestionKey = new System.ComponentModel.BackgroundWorker();
             this.storageDirDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.qfilFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.keyRepoDialog = new System.Windows.Forms.FolderBrowserDialog();
@@ -300,7 +301,7 @@ namespace ossaTool
             this.comBoxSku.Location = new System.Drawing.Point(140, 49);
             this.comBoxSku.Margin = new System.Windows.Forms.Padding(2);
             this.comBoxSku.Name = "comBoxSku";
-            this.comBoxSku.Size = new System.Drawing.Size(118, 23);
+            this.comBoxSku.Size = new System.Drawing.Size(91, 23);
             this.comBoxSku.TabIndex = 17;
             this.comBoxSku.SelectedIndexChanged += new System.EventHandler(this.comBoxSku_SelectedIndexChanged);
             // 
@@ -411,7 +412,7 @@ namespace ossaTool
             // lblPluginHint
             // 
             this.lblPluginHint.AutoSize = true;
-            this.lblPluginHint.Location = new System.Drawing.Point(233, 20);
+            this.lblPluginHint.Location = new System.Drawing.Point(247, 20);
             this.lblPluginHint.Name = "lblPluginHint";
             this.lblPluginHint.Size = new System.Drawing.Size(318, 15);
             this.lblPluginHint.TabIndex = 1;
@@ -422,7 +423,7 @@ namespace ossaTool
             this.txtCountDown.Location = new System.Drawing.Point(177, 17);
             this.txtCountDown.Name = "txtCountDown";
             this.txtCountDown.ReadOnly = true;
-            this.txtCountDown.Size = new System.Drawing.Size(50, 23);
+            this.txtCountDown.Size = new System.Drawing.Size(54, 23);
             this.txtCountDown.TabIndex = 0;
             // 
             // tabPage3
@@ -489,7 +490,7 @@ namespace ossaTool
             this.txtStoragePath.Location = new System.Drawing.Point(140, 5);
             this.txtStoragePath.Name = "txtStoragePath";
             this.txtStoragePath.ReadOnly = true;
-            this.txtStoragePath.Size = new System.Drawing.Size(387, 23);
+            this.txtStoragePath.Size = new System.Drawing.Size(401, 23);
             this.txtStoragePath.TabIndex = 9;
             // 
             // bgWorkerConnection
@@ -512,6 +513,13 @@ namespace ossaTool
             this.bgWorkerEdl.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgWorkerEdl_DoWork);
             this.bgWorkerEdl.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgWorkerEdl_ProgressChanged);
             this.bgWorkerEdl.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgWorkerEdl_RunWorkerCompleted);
+            // 
+            // bgWorkerAttestionKey
+            // 
+            this.bgWorkerAttestionKey.WorkerReportsProgress = true;
+            this.bgWorkerAttestionKey.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bgWorkerAttestionKey_DoWork);
+            this.bgWorkerAttestionKey.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bgWorkerAttestionKey_ProgressChanged);
+            this.bgWorkerAttestionKey.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bgWorkerAttestionKey_RunWorkerCompleted);
             // 
             // qfilFileDialog
             // 
@@ -574,7 +582,7 @@ namespace ossaTool
             // 
             this.btnOpenStorageDir.BackColor = System.Drawing.Color.LightSteelBlue;
             this.btnOpenStorageDir.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnOpenStorageDir.Location = new System.Drawing.Point(533, 5);
+            this.btnOpenStorageDir.Location = new System.Drawing.Point(544, 5);
             this.btnOpenStorageDir.Name = "btnOpenStorageDir";
             this.btnOpenStorageDir.Size = new System.Drawing.Size(69, 23);
             this.btnOpenStorageDir.TabIndex = 11;
@@ -628,6 +636,7 @@ namespace ossaTool
         private System.Windows.Forms.ProgressBar pgBarEdl;
         private System.Windows.Forms.Button btnEdl;
         private System.ComponentModel.BackgroundWorker bgWorkerEdl;
+        private System.ComponentModel.BackgroundWorker bgWorkerAttestionKey;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Label lblDHCP;
         private System.Windows.Forms.TextBox txtLog2;

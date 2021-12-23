@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 
 namespace ossaTool
@@ -25,9 +26,19 @@ namespace ossaTool
             };
         }
 
+        public static string WriteKeyFile(string keyboxPath, string key)
+        {
+            _p.StartInfo.Arguments = $"shell LD_LIBRARY_PATH=/vendor/lib64/hw KmInstallKeybox /data/{Path.GetFileName(keyboxPath)} {key} true";
+            _p.Start();
+            _p.StandardInput.WriteLine("adb " + _p.StartInfo.Arguments);
+            string output = _p.StandardOutput.ReadToEnd();
+            _p.WaitForExit();
+            return output;
+        }
+
         public static string PushKeyFile(string keyFilePath)
         {
-            return RequestCommand($"push {keyFilePath} /data");
+            return RequestCommand($"push {keyFilePath} /data",true,false);
         }
 
         public static void WriteSkuId()
