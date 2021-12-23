@@ -64,6 +64,7 @@ namespace ossaTool
         private CountDownTimer _timer = new CountDownTimer();
         private string _deviceSerialNumber = "";
         private string _macAddress = "";
+        private string _ipAddress = "";
         private string _skuId = "";
         private string _key = "";
         private bool _keyExisted = false;
@@ -74,47 +75,52 @@ namespace ossaTool
         #region tabpage 1
         private void btn1Connect_Click(object sender, EventArgs e)
         {
+            txtLog.Text = "";
+
             txt1ConnectionStatus.Text = _pleaseWait;
-            btn1ConnectCheck.Enabled = false;
-            btnEdl.Enabled = false;
+            panelButtonGroup.Enabled = false;
             _connectionStatus = false;
+
             bgWorkerConnection.RunWorkerAsync();
         }
 
         private void bgWorkerConnection_DoWork(object sender, DoWorkEventArgs e)
         {
-            ConnectionProcess(e, false);
+            CheckProcess(e, false);
         }
 
-        private void ConnectionProcess(DoWorkEventArgs e, bool edlProcess)
+        private void CheckProcess(DoWorkEventArgs e, bool edlProcess)
         {
-            Regex rgx = new Regex("device");
-            for (int j = 0; j < 100; j++)
+            if (edlProcess)
             {
-                _processLog = AdbOperation.CheckDeviceConnection();
-                if (rgx.Matches(_processLog).Count == 1 && edlProcess)
+                for (int checkPoint = 0; checkPoint <= 100; checkPoint++)
                 {
-                    bgWorkerEdl.ReportProgress(100);
-                    _rebootEdlStatus = true;
-                    e.Cancel = true;
-                    break;
-
+                    _processLog = AdbOperation.CheckDeviceConnection();
+                    if (Util.CheckDeviceStatus(_processLog) == 1)
+                    {
+                        bgWorkerEdl.ReportProgress(100);
+                        _rebootEdlStatus = true;
+                        e.Cancel = true;
+                        break;
+                    }
+                    Thread.Sleep(150);
+                    bgWorkerEdl.ReportProgress(checkPoint);
                 }
-                else if (rgx.Matches(_processLog).Count > 1 && !edlProcess)
+            }
+            else
+            {
+                for (int checkPoint = 0; checkPoint <= 100; checkPoint++)
                 {
-                    bgWorkerConnection.ReportProgress(100);
-                    _connectionStatus = true;
-                    e.Cancel = true;
-                    break;
-                }
-                Thread.Sleep(300);
-                if (edlProcess)
-                {
-                    bgWorkerEdl.ReportProgress(j);
-                }
-                else
-                {
-                    bgWorkerConnection.ReportProgress(j);
+                    _processLog = AdbOperation.CheckDeviceConnection();
+                    if (Util.CheckDeviceStatus(_processLog) > 1)
+                    {
+                        bgWorkerConnection.ReportProgress(100);
+                        _connectionStatus = true;
+                        e.Cancel = true;
+                        break;
+                    }
+                    Thread.Sleep(150);
+                    bgWorkerConnection.ReportProgress(checkPoint);
                 }
             }
         }
@@ -126,51 +132,24 @@ namespace ossaTool
 
         private void bgWorkerConnection_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            btn1ConnectCheck.Enabled = true;
+            panelButtonGroup.Enabled = true;
             if (_connectionStatus)
             {
                 txt1ConnectionStatus.Text = _success;
-                btnEdl.Enabled = true;
-                txtLog.Text = $"{ _processLog}Brand: {AdbOperation.CheckDeviceBrand()}\r\nVersion: {AdbOperation.CheckDeviceVersion()}";
+                string deviceType = AdbOperation.CheckBoard();
+                txtLog.Text = $"{ _processLog}Board: {deviceType}\r\nBrand: {AdbOperation.CheckDeviceBrand()}\r\nVersion: {AdbOperation.CheckDeviceVersion()}";
+                if (!deviceType.Equals("qcs605") && !deviceType.Equals("qcs603"))
+                {
+                    MessageBox.Show("請更換 qcs605/qcs603 的板子或聯繫客服", $"目前不支援 {deviceType}",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                }
+                else
+                {
+                    btnEdl.Enabled = true;
+                }
             }
             else
             {
                 txt1ConnectionStatus.Text = _error;
-                txtLog.Text = _errLog;
-            }
-        }
-
-        private void btnEdl_Click(object sender, EventArgs e)
-        {
-            txt1EdlStatus.Text = _pleaseWait;
-            btnEdl.Enabled = false;
-            _rebootEdlStatus = false;
-            AdbOperation.RebootAndEnterEDL();
-            bgWorkerEdl.RunWorkerAsync();
-        }
-
-        private void bgWorkerEdl_DoWork(object sender, DoWorkEventArgs e)
-        {
-            ConnectionProcess(e, true);
-        }
-
-        private void bgWorkerEdl_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            pgBarEdl.Value = e.ProgressPercentage;
-        }
-
-        private void bgWorkerEdl_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (_rebootEdlStatus)
-            {
-                txt1EdlStatus.Text = _success;
-                btnQFIL.Enabled = true;
-                txtLog.Text = _rebootEdlSuccessLog;
-            }
-            else
-            {
-                txt1EdlStatus.Text = _error;
-                btnQFIL.Enabled = false;
                 txtLog.Text = _errLog;
             }
         }
@@ -190,22 +169,60 @@ namespace ossaTool
             }
         }
 
-        private void btnQFIL_Click(object sender, EventArgs e)
+        private void btnEdl_Click(object sender, EventArgs e)
         {
             if (!File.Exists(Properties.Settings.Default.QFILFilePath))
             {
-                MessageBox.Show("燒機檔案不存在, 請重新確認");
+                MessageBox.Show("燒機檔案不存在", "請重新確認", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             if (new FileInfo(Properties.Settings.Default.QFILFilePath).Extension != ".elf")
             {
-                MessageBox.Show("燒機檔案格式不正確, 請重新確認");
+                MessageBox.Show("燒機檔案格式不正確", "請重新確認", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+            txt1EdlStatus.Text = _pleaseWait;
+            panelButtonGroup.Enabled = false;
+            _rebootEdlStatus = false;
+
+            AdbOperation.RebootAndEnterEDL();
+            bgWorkerEdl.RunWorkerAsync();
+        }
+
+        private void bgWorkerEdl_DoWork(object sender, DoWorkEventArgs e)
+        {
+            CheckProcess(e, true);
+        }
+
+        private void bgWorkerEdl_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            pgBarEdl.Value = e.ProgressPercentage;
+        }
+
+        private void bgWorkerEdl_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            panelButtonGroup.Enabled = true;
+            if (_rebootEdlStatus)
+            {
+                txt1EdlStatus.Text = _success;
+                btnConnectCheck.Enabled = false;
+                btnEdl.Enabled = false;
+                btnQFIL.Enabled = true;
+                txtLog.Text = _rebootEdlSuccessLog;
+            }
+            else
+            {
+                txt1EdlStatus.Text = _error;
+                txtLog.Text = _errLog;
+            }
+        }
+
+        private void btnQFIL_Click(object sender, EventArgs e)
+        {
             _processLog = "";
             _qfilStatus = false;
             txt1QFILStatus.Text = _pleaseWait;
-            tabControlMenu.Enabled = false;
+            panelButtonGroup.Enabled = false;
             bgWorkerQFIL.RunWorkerAsync();
         }
 
@@ -265,11 +282,10 @@ namespace ossaTool
 
         private void bgWorkerQFIL_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            tabControlMenu.Enabled = true;
+            panelButtonGroup.Enabled = true;
             if (_qfilStatus)
             {
                 txt1QFILStatus.Text = _success;
-
                 DialogResult result = MessageBox.Show("拔除 USB 線後, 請依 Step 2 指示操作");
                 if (result == DialogResult.OK)
                     tabControlMenu.SelectedIndex = 1;
@@ -301,25 +317,26 @@ namespace ossaTool
             }
             if (MessageBox.Show("USB 線接回去了嗎?", "溫馨提醒", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                Thread.Sleep(1200);
-                string currentBrand = AdbOperation.CheckDeviceBrand();
+                string currentBrand = "";
+                while (currentBrand.Length == 0)
+                {
+                    Thread.Sleep(2000);
+                    currentBrand = AdbOperation.CheckDeviceBrand();
+                }
 
                 if (currentBrand != "SnST")
                 {
                     AdbOperation.RebootAndEnterEDL();
-                    MessageBox.Show($"目前為 {currentBrand} 應為 SnST, 請修正檔案後重新燒錄", "商標有誤");
+                    MessageBox.Show($"目前為 {currentBrand} 應為 SnST, 請修正檔案後重新燒錄", "商標有誤", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     tabControlMenu.SelectedIndex = 0;
                 }
                 else
                 {
-
                     #region get IP address
-                    AdbOperation.GiveRootAccess();
-                    Thread.Sleep(800);
-
+                  
                     _processLog = AdbOperation.LogAddress();
-                    string ipAddress = Util.GetIPAddress(_processLog);
-                    txtLog2.Text = (ipAddress.Length>0) ? $"IP address: [{ipAddress}]" : "請拔除USB線後靜待 5秒再重新測試";
+                    _ipAddress = Util.GetIPAddress(_processLog);
+                    txtLog2.Text = (_ipAddress.Length>0) ? $"IP address: [{_ipAddress}]" : "請拔除USB線後靜待 5秒再重新測試";
                     #endregion
 
                     #region device serial number
@@ -363,7 +380,8 @@ namespace ossaTool
         private void btnRPMBInitialize_Click(object sender, EventArgs e)
         {
             _provisionFinished = false;
-
+            AdbOperation.GiveRootAccess();
+            Thread.Sleep(1000);
             AdbOperation.InitializeRPMB();
             txtLog2.Text = AdbOperation.CheckRPMBStatus();
             txtLog2.SelectionStart = txtLog2.TextLength;
@@ -441,12 +459,7 @@ namespace ossaTool
                 return;
             }
 
-            string deviceType = AdbOperation.CheckBoard();
-            if (!deviceType.Equals("qcs605") && !deviceType.Equals("qcs603"))
-            {
-                MessageBox.Show("目前不支援 " + deviceType + "裝置種類, 請聯繫客服!");
-                return;
-            }
+    
 
             AdbOperation.GiveRootAccess();
 

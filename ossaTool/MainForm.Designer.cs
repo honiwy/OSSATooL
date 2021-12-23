@@ -32,17 +32,18 @@ namespace ossaTool
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tabControlMenu = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.txtQFILPath = new System.Windows.Forms.TextBox();
+            this.panelButtonGroup = new System.Windows.Forms.Panel();
+            this.btnConnectCheck = new System.Windows.Forms.Button();
             this.btnQFILPath = new System.Windows.Forms.Button();
+            this.btnEdl = new System.Windows.Forms.Button();
+            this.btnQFIL = new System.Windows.Forms.Button();
+            this.txtQFILPath = new System.Windows.Forms.TextBox();
             this.txt1EdlStatus = new System.Windows.Forms.TextBox();
             this.pgBarEdl = new System.Windows.Forms.ProgressBar();
-            this.btnEdl = new System.Windows.Forms.Button();
             this.txtLog = new System.Windows.Forms.TextBox();
             this.pgBarQFIL = new System.Windows.Forms.ProgressBar();
             this.pgBarConnection = new System.Windows.Forms.ProgressBar();
             this.txt1QFILStatus = new System.Windows.Forms.TextBox();
-            this.btnQFIL = new System.Windows.Forms.Button();
-            this.btn1ConnectCheck = new System.Windows.Forms.Button();
             this.txt1ConnectionStatus = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.label3 = new System.Windows.Forms.Label();
@@ -77,6 +78,7 @@ namespace ossaTool
             this.btnOpenStorageDir = new System.Windows.Forms.Button();
             this.tabControlMenu.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.panelButtonGroup.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -101,17 +103,14 @@ namespace ossaTool
             // tabPage1
             // 
             this.tabPage1.BackColor = System.Drawing.Color.LightSlateGray;
+            this.tabPage1.Controls.Add(this.panelButtonGroup);
             this.tabPage1.Controls.Add(this.txtQFILPath);
-            this.tabPage1.Controls.Add(this.btnQFILPath);
             this.tabPage1.Controls.Add(this.txt1EdlStatus);
             this.tabPage1.Controls.Add(this.pgBarEdl);
-            this.tabPage1.Controls.Add(this.btnEdl);
             this.tabPage1.Controls.Add(this.txtLog);
             this.tabPage1.Controls.Add(this.pgBarQFIL);
             this.tabPage1.Controls.Add(this.pgBarConnection);
             this.tabPage1.Controls.Add(this.txt1QFILStatus);
-            this.tabPage1.Controls.Add(this.btnQFIL);
-            this.tabPage1.Controls.Add(this.btn1ConnectCheck);
             this.tabPage1.Controls.Add(this.txt1ConnectionStatus);
             this.tabPage1.Location = new System.Drawing.Point(4, 24);
             this.tabPage1.Name = "tabPage1";
@@ -120,19 +119,34 @@ namespace ossaTool
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Step 1: 環境建立";
             // 
-            // txtQFILPath
+            // panelButtonGroup
             // 
-            this.txtQFILPath.Location = new System.Drawing.Point(140, 100);
-            this.txtQFILPath.Name = "txtQFILPath";
-            this.txtQFILPath.ReadOnly = true;
-            this.txtQFILPath.Size = new System.Drawing.Size(458, 23);
-            this.txtQFILPath.TabIndex = 12;
+            this.panelButtonGroup.Controls.Add(this.btnConnectCheck);
+            this.panelButtonGroup.Controls.Add(this.btnQFILPath);
+            this.panelButtonGroup.Controls.Add(this.btnEdl);
+            this.panelButtonGroup.Controls.Add(this.btnQFIL);
+            this.panelButtonGroup.Location = new System.Drawing.Point(20, 20);
+            this.panelButtonGroup.Name = "panelButtonGroup";
+            this.panelButtonGroup.Size = new System.Drawing.Size(117, 143);
+            this.panelButtonGroup.TabIndex = 13;
+            // 
+            // btnConnectCheck
+            // 
+            this.btnConnectCheck.BackColor = System.Drawing.Color.RosyBrown;
+            this.btnConnectCheck.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnConnectCheck.Location = new System.Drawing.Point(0, 0);
+            this.btnConnectCheck.Name = "btnConnectCheck";
+            this.btnConnectCheck.Size = new System.Drawing.Size(107, 23);
+            this.btnConnectCheck.TabIndex = 1;
+            this.btnConnectCheck.Text = "攝影機連接確認";
+            this.btnConnectCheck.UseVisualStyleBackColor = false;
+            this.btnConnectCheck.Click += new System.EventHandler(this.btn1Connect_Click);
             // 
             // btnQFILPath
             // 
-            this.btnQFILPath.BackColor = System.Drawing.Color.LightGoldenrodYellow;
+            this.btnQFILPath.BackColor = System.Drawing.Color.Tan;
             this.btnQFILPath.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnQFILPath.Location = new System.Drawing.Point(20, 100);
+            this.btnQFILPath.Location = new System.Drawing.Point(0, 41);
             this.btnQFILPath.Name = "btnQFILPath";
             this.btnQFILPath.Size = new System.Drawing.Size(107, 23);
             this.btnQFILPath.TabIndex = 11;
@@ -140,9 +154,45 @@ namespace ossaTool
             this.btnQFILPath.UseVisualStyleBackColor = false;
             this.btnQFILPath.Click += new System.EventHandler(this.btnQFILPath_Click);
             // 
+            // btnEdl
+            // 
+            this.btnEdl.BackColor = System.Drawing.Color.LightGoldenrodYellow;
+            this.btnEdl.Enabled = false;
+            this.btnEdl.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnEdl.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btnEdl.Location = new System.Drawing.Point(0, 80);
+            this.btnEdl.Name = "btnEdl";
+            this.btnEdl.Size = new System.Drawing.Size(107, 23);
+            this.btnEdl.TabIndex = 8;
+            this.btnEdl.Text = "切換燒機模式";
+            this.btnEdl.UseVisualStyleBackColor = false;
+            this.btnEdl.Click += new System.EventHandler(this.btnEdl_Click);
+            // 
+            // btnQFIL
+            // 
+            this.btnQFIL.BackColor = System.Drawing.Color.DarkSeaGreen;
+            this.btnQFIL.Enabled = false;
+            this.btnQFIL.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnQFIL.Location = new System.Drawing.Point(0, 120);
+            this.btnQFIL.Name = "btnQFIL";
+            this.btnQFIL.Size = new System.Drawing.Size(107, 23);
+            this.btnQFIL.TabIndex = 2;
+            this.btnQFIL.Text = "執行燒機";
+            this.btnQFIL.UseCompatibleTextRendering = true;
+            this.btnQFIL.UseVisualStyleBackColor = false;
+            this.btnQFIL.Click += new System.EventHandler(this.btnQFIL_Click);
+            // 
+            // txtQFILPath
+            // 
+            this.txtQFILPath.Location = new System.Drawing.Point(140, 61);
+            this.txtQFILPath.Name = "txtQFILPath";
+            this.txtQFILPath.ReadOnly = true;
+            this.txtQFILPath.Size = new System.Drawing.Size(458, 23);
+            this.txtQFILPath.TabIndex = 12;
+            // 
             // txt1EdlStatus
             // 
-            this.txt1EdlStatus.Location = new System.Drawing.Point(140, 60);
+            this.txt1EdlStatus.Location = new System.Drawing.Point(140, 100);
             this.txt1EdlStatus.Name = "txt1EdlStatus";
             this.txt1EdlStatus.ReadOnly = true;
             this.txt1EdlStatus.Size = new System.Drawing.Size(68, 23);
@@ -151,26 +201,12 @@ namespace ossaTool
             // pgBarEdl
             // 
             this.pgBarEdl.ForeColor = System.Drawing.Color.Tan;
-            this.pgBarEdl.Location = new System.Drawing.Point(222, 60);
+            this.pgBarEdl.Location = new System.Drawing.Point(222, 100);
             this.pgBarEdl.Name = "pgBarEdl";
             this.pgBarEdl.Size = new System.Drawing.Size(376, 23);
             this.pgBarEdl.Step = 1;
             this.pgBarEdl.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.pgBarEdl.TabIndex = 9;
-            // 
-            // btnEdl
-            // 
-            this.btnEdl.BackColor = System.Drawing.Color.Tan;
-            this.btnEdl.Enabled = false;
-            this.btnEdl.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnEdl.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btnEdl.Location = new System.Drawing.Point(20, 60);
-            this.btnEdl.Name = "btnEdl";
-            this.btnEdl.Size = new System.Drawing.Size(107, 23);
-            this.btnEdl.TabIndex = 8;
-            this.btnEdl.Text = "切換燒機模式";
-            this.btnEdl.UseVisualStyleBackColor = false;
-            this.btnEdl.Click += new System.EventHandler(this.btnEdl_Click);
             // 
             // txtLog
             // 
@@ -210,32 +246,6 @@ namespace ossaTool
             this.txt1QFILStatus.Size = new System.Drawing.Size(68, 23);
             this.txt1QFILStatus.TabIndex = 3;
             // 
-            // btnQFIL
-            // 
-            this.btnQFIL.BackColor = System.Drawing.Color.DarkSeaGreen;
-            this.btnQFIL.Enabled = false;
-            this.btnQFIL.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnQFIL.Location = new System.Drawing.Point(20, 140);
-            this.btnQFIL.Name = "btnQFIL";
-            this.btnQFIL.Size = new System.Drawing.Size(107, 23);
-            this.btnQFIL.TabIndex = 2;
-            this.btnQFIL.Text = "執行燒機";
-            this.btnQFIL.UseCompatibleTextRendering = true;
-            this.btnQFIL.UseVisualStyleBackColor = false;
-            this.btnQFIL.Click += new System.EventHandler(this.btnQFIL_Click);
-            // 
-            // btn1ConnectCheck
-            // 
-            this.btn1ConnectCheck.BackColor = System.Drawing.Color.RosyBrown;
-            this.btn1ConnectCheck.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btn1ConnectCheck.Location = new System.Drawing.Point(20, 20);
-            this.btn1ConnectCheck.Name = "btn1ConnectCheck";
-            this.btn1ConnectCheck.Size = new System.Drawing.Size(107, 23);
-            this.btn1ConnectCheck.TabIndex = 1;
-            this.btn1ConnectCheck.Text = "攝影機連接確認";
-            this.btn1ConnectCheck.UseVisualStyleBackColor = false;
-            this.btn1ConnectCheck.Click += new System.EventHandler(this.btn1Connect_Click);
-            // 
             // txt1ConnectionStatus
             // 
             this.txt1ConnectionStatus.Location = new System.Drawing.Point(140, 20);
@@ -272,12 +282,12 @@ namespace ossaTool
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(578, 275);
+            this.label3.Location = new System.Drawing.Point(20, 52);
             this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(54, 15);
+            this.label3.Size = new System.Drawing.Size(93, 15);
             this.label3.TabIndex = 18;
-            this.label3.Text = "Sku ID：";
+            this.label3.Text = "選擇的 Sku ID：";
             // 
             // comBoxSku
             // 
@@ -287,7 +297,7 @@ namespace ossaTool
             "BST_VD2",
             "BST_MD2",
             "Generic"});
-            this.comBoxSku.Location = new System.Drawing.Point(636, 272);
+            this.comBoxSku.Location = new System.Drawing.Point(140, 49);
             this.comBoxSku.Margin = new System.Windows.Forms.Padding(2);
             this.comBoxSku.Name = "comBoxSku";
             this.comBoxSku.Size = new System.Drawing.Size(118, 23);
@@ -297,7 +307,7 @@ namespace ossaTool
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(237, 323);
+            this.label1.Location = new System.Drawing.Point(237, 347);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(19, 15);
             this.label1.TabIndex = 16;
@@ -305,7 +315,7 @@ namespace ossaTool
             // 
             // txtKeyRepoPath
             // 
-            this.txtKeyRepoPath.Location = new System.Drawing.Point(140, 279);
+            this.txtKeyRepoPath.Location = new System.Drawing.Point(140, 303);
             this.txtKeyRepoPath.Name = "txtKeyRepoPath";
             this.txtKeyRepoPath.ReadOnly = true;
             this.txtKeyRepoPath.Size = new System.Drawing.Size(397, 23);
@@ -316,7 +326,7 @@ namespace ossaTool
             this.btnChangeKeyRepo.BackColor = System.Drawing.Color.LightGoldenrodYellow;
             this.btnChangeKeyRepo.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnChangeKeyRepo.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btnChangeKeyRepo.Location = new System.Drawing.Point(20, 279);
+            this.btnChangeKeyRepo.Location = new System.Drawing.Point(20, 303);
             this.btnChangeKeyRepo.Name = "btnChangeKeyRepo";
             this.btnChangeKeyRepo.Size = new System.Drawing.Size(107, 23);
             this.btnChangeKeyRepo.TabIndex = 14;
@@ -326,7 +336,7 @@ namespace ossaTool
             // 
             // txtKeyName
             // 
-            this.txtKeyName.Location = new System.Drawing.Point(263, 319);
+            this.txtKeyName.Location = new System.Drawing.Point(263, 343);
             this.txtKeyName.Name = "txtKeyName";
             this.txtKeyName.ReadOnly = true;
             this.txtKeyName.Size = new System.Drawing.Size(274, 23);
@@ -334,7 +344,7 @@ namespace ossaTool
             // 
             // txtKeyboxPath
             // 
-            this.txtKeyboxPath.Location = new System.Drawing.Point(140, 319);
+            this.txtKeyboxPath.Location = new System.Drawing.Point(140, 343);
             this.txtKeyboxPath.Name = "txtKeyboxPath";
             this.txtKeyboxPath.ReadOnly = true;
             this.txtKeyboxPath.Size = new System.Drawing.Size(91, 23);
@@ -345,7 +355,7 @@ namespace ossaTool
             this.btnKeyBurn.BackColor = System.Drawing.Color.DarkSeaGreen;
             this.btnKeyBurn.Enabled = false;
             this.btnKeyBurn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnKeyBurn.Location = new System.Drawing.Point(20, 319);
+            this.btnKeyBurn.Location = new System.Drawing.Point(20, 343);
             this.btnKeyBurn.Name = "btnKeyBurn";
             this.btnKeyBurn.Size = new System.Drawing.Size(107, 23);
             this.btnKeyBurn.TabIndex = 8;
@@ -359,7 +369,7 @@ namespace ossaTool
             this.btnRPMBInitialize.Enabled = false;
             this.btnRPMBInitialize.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnRPMBInitialize.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.btnRPMBInitialize.Location = new System.Drawing.Point(21, 236);
+            this.btnRPMBInitialize.Location = new System.Drawing.Point(21, 260);
             this.btnRPMBInitialize.Name = "btnRPMBInitialize";
             this.btnRPMBInitialize.Size = new System.Drawing.Size(107, 23);
             this.btnRPMBInitialize.TabIndex = 7;
@@ -378,7 +388,7 @@ namespace ossaTool
             // 
             // txtLog2
             // 
-            this.txtLog2.Location = new System.Drawing.Point(140, 60);
+            this.txtLog2.Location = new System.Drawing.Point(140, 84);
             this.txtLog2.Multiline = true;
             this.txtLog2.Name = "txtLog2";
             this.txtLog2.ReadOnly = true;
@@ -390,7 +400,7 @@ namespace ossaTool
             // 
             this.btnGetIP.BackColor = System.Drawing.Color.RosyBrown;
             this.btnGetIP.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnGetIP.Location = new System.Drawing.Point(20, 60);
+            this.btnGetIP.Location = new System.Drawing.Point(20, 84);
             this.btnGetIP.Name = "btnGetIP";
             this.btnGetIP.Size = new System.Drawing.Size(107, 23);
             this.btnGetIP.TabIndex = 2;
@@ -586,6 +596,7 @@ namespace ossaTool
             this.tabControlMenu.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            this.panelButtonGroup.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             this.tabPage3.ResumeLayout(false);
@@ -605,7 +616,7 @@ namespace ossaTool
         private System.Windows.Forms.TabControl tabControlMenu;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TextBox txt1ConnectionStatus;
-        private System.Windows.Forms.Button btn1ConnectCheck;
+        private System.Windows.Forms.Button btnConnectCheck;
         private System.Windows.Forms.Button btnQFIL;
         private System.Windows.Forms.TextBox txt1QFILStatus;
         private System.ComponentModel.BackgroundWorker bgWorkerConnection;
@@ -647,6 +658,7 @@ namespace ossaTool
         private System.Windows.Forms.Label labelDescription;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox comBoxSku;
+        private System.Windows.Forms.Panel panelButtonGroup;
     }
 }
 

@@ -26,6 +26,11 @@ namespace ossaTool
 
         }
 
+        public static int CheckDeviceStatus(string log)
+        {
+            return new Regex("device").Matches(log).Count;
+        }
+
         public static bool CheckQFilSuccessful(string log)
         {
             return new Regex("Finish Download").Matches(log).Count == 1 && new Regex("Download Succeed").Matches(log).Count == 1;
