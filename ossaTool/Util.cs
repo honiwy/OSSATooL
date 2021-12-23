@@ -41,6 +41,16 @@ namespace ossaTool
             return new Regex("RPMB_KEY_PROVISIONED_AND_OK").Matches(log).Count == 1;
         }
 
+        public static bool CheckAttestionKeySuccessful(string log)
+        {
+            return new Regex("InstallKeybox is done").Matches(log).Count == 1;
+        }
+
+        public static bool CheckAttestionKeyWrong(string log)
+        {
+            return new Regex("InstallKeybox Failed").Matches(log).Count == 1;
+        }
+
         public static string GetIPAddress(string log)
         {
             MatchCollection mc = new Regex(@"LinkAddresses.+?(?=\])").Matches(log);
